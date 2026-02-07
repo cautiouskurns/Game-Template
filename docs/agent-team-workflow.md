@@ -1114,6 +1114,136 @@ qa-docs (gdscript-quality-checker)        → docs/code-reviews/[tool]_review.md
 
 ---
 
+## Team Scaling by Lifecycle Phase
+
+The team composition changes as the project grows. Not all 7 agents are needed at all phases, and some roles split when volume warrants it.
+
+### Prototype Phase (7 agents)
+
+```
+design-lead, systems-dev, gameplay-dev, ui-dev, content-architect, asset-artist, qa-docs
+```
+All roles as defined above. asset-artist handles both visual and audio.
+
+### Vertical Slice Phase (8 agents — asset-artist splits)
+
+When polish matters and asset volume increases, split asset-artist into two:
+
+| Agent | Tools | Directories |
+|-------|-------|-------------|
+| **visual-artist** | Ludo MCP (createImage, editImage, generateWithStyle, animateSprite, create3DModel, generatePose) | `assets/` (all subdirectories) |
+| **audio-artist** | Epidemic Sound MCP (SearchRecordings, SearchSoundEffects, Download*) + Ludo (createSpeech, createVoice) | `music/`, `sfx/`, `voice/` |
+
+**Why this works:** Completely different MCP tools, zero file overlap, independent creative processes.
+
+**Why not earlier:** During prototype, audio needs are minimal — a handful of placeholder sounds isn't enough work for a dedicated agent.
+
+### Production Phase (8 agents)
+
+Same as vertical slice. Consider whether content-architect needs help if content volume is very high — but don't split due to campaign-creator's cross-reference requirements.
+
+---
+
+## Skill Genre Compatibility
+
+**Important:** Many skills in this template were originally designed for a CRPG editor project. Not all are suitable for every game genre. Before starting a new project, review which skills apply.
+
+### Fully Generic (any game genre)
+
+These skills work for platformers, puzzles, shooters, RPGs, strategy — anything:
+
+| Skill | Used By | Notes |
+|-------|---------|-------|
+| `concept-validator` | design-lead | Genre-agnostic feasibility testing |
+| `game-concept-generator` | design-lead | Explicitly supports all genres |
+| `design-bible-updater` | design-lead | Universal design pillars framework |
+| `prototype-gdd-generator` | design-lead | Process-focused, genre-neutral |
+| `vertical-slice-gdd-generator` | design-lead | Generic process, slight action bias in examples |
+| `feature-spec-generator` | design-lead | Template is generic, examples lean action |
+| `feature-idea-designer` | design-lead | Framework generic, examples lean RPG |
+| `feature-implementer` | all dev agents | Godot-generic, examples lean RPG |
+| `gdscript-quality-checker` | qa-docs | Language-level analysis, fully generic |
+| `gdscript-refactor-executor` | dev agents | Code refactoring, fully generic |
+| `data-driven-refactor` | qa-docs | Code analysis, fully generic |
+| `data-extractor` | qa-docs | Data extraction, fully generic |
+| `scene-optimizer` | gameplay-dev, ui-dev | Godot scene analysis, fully generic |
+| `vfx-generator` | gameplay-dev | Procedural particles, any genre |
+| `error-debugger` | dev agents | Debugging, fully generic |
+| `systems-bible-updater` | qa-docs | Technical docs, fully generic |
+| `architecture-documenter` | qa-docs | Structure docs, fully generic |
+| `system-diagram-generator` | qa-docs | Diagrams, fully generic |
+| `changelog-updater` | qa-docs | Changelog, fully generic |
+| `version-control-helper` | qa-docs | Git workflows, fully generic |
+| `tool-spec-generator` | design-lead | Tool specs, fully generic |
+| `tool-roadmap-planner` | design-lead | Tool planning, fully generic |
+| `tool-feature-implementer` | systems-dev | Tool building, fully generic |
+
+### RPG/Narrative Content Pipeline (RPG and narrative games only)
+
+These skills assume quest-based progression, NPC dialogue, D&D-style stats, and campaign structures. **Skip these entirely for non-narrative games:**
+
+| Skill | Used By | Genre Limitation |
+|-------|---------|-----------------|
+| `campaign-creator` | content-architect | CRPG-specific: quest chains, chapters, NPC recruitment |
+| `character-creator` | content-architect | CRPG-specific: D&D stats (STR/DEX/CON), companion tiers |
+| `quest-designer` | content-architect | CRPG-specific: quest types, "talk_to_npc" objectives |
+| `dialogue-designer` | content-architect | CRPG-specific: dialogue trees, Persuasion/Intimidation checks |
+| `encounter-designer` | content-architect | CRPG-specific: D&D CR difficulty, combat encounters |
+| `narrative-architect` | design-lead | RPG-biased: quest hooks, companion arcs |
+| `lore-generator` | content-architect | Mostly generic but examples assume fantasy RPG |
+| `world-builder` | content-architect | RPG-biased: settlements, services (shop/inn/blacksmith) |
+| `game-ideator` | design-lead | RPG-biased: D&D module import, tabletop conversion |
+| `production-gdd-generator` | design-lead | CRPG/live-service: economy, monetization, meta-progression |
+
+### Impact on Team by Genre
+
+| Game Genre | content-architect | design-lead changes | Notes |
+|-----------|------------------|-------------------|-------|
+| **CRPG / RPG** | Full role, all skills | Add `narrative-architect`, `game-ideator` | All skills apply |
+| **Action / Roguelike** | Partial — use for enemy data, level configs | Drop `campaign-creator`, `dialogue-designer` | Encounters may apply, quests likely don't |
+| **Platformer** | Minimal — level data, enemy configs | Drop all RPG content skills | content-architect creates JSON level/enemy definitions |
+| **Puzzle** | Minimal — puzzle configs, level data | Drop all RPG content skills | content-architect creates puzzle definition files |
+| **Strategy** | Partial — `world-builder` may apply | Drop quest/dialogue skills | Location system adaptable to strategy maps |
+| **Narrative / Visual Novel** | Partial — dialogue + characters apply | Keep `narrative-architect` | Skip encounters, quests may not apply |
+
+### Adapting for Non-RPG Games
+
+For non-RPG genres, content-architect still creates data files but uses **generic JSON schemas** instead of the CRPG-specific skills:
+
+```
+Platformer content-architect might create:
+  data/levels/level_01.json          (layout, spawn points, collectibles)
+  data/enemies/goomba.json           (behavior, speed, damage)
+  data/powerups/double_jump.json     (duration, effect)
+
+Puzzle content-architect might create:
+  data/puzzles/chapter_1/puzzle_01.json  (grid size, rules, solution)
+  data/difficulty/curve.json              (progression tuning)
+
+Tower Defense content-architect might create:
+  data/towers/archer_tower.json      (range, damage, cost, upgrades)
+  data/waves/wave_01.json            (enemy types, spawn timing, paths)
+  data/maps/forest_map.json          (paths, tower slots)
+```
+
+The directory ownership (`data/`) and the role (structured game data) remain the same — only the skills and schemas change.
+
+### Skills That Need Revision
+
+The following skills would benefit from genre-agnostic revisions to make the template truly universal:
+
+| Skill | Issue | Recommended Fix |
+|-------|-------|----------------|
+| `feature-implementer` | Examples assume combat/RPG systems | Diversify examples (add platformer, puzzle scenarios) |
+| `feature-idea-designer` | Examples reference inventory, economy, parts | Add non-RPG example flows |
+| `production-gdd-generator` | Assumes economy, monetization, live-ops | Make these sections conditional, not mandatory |
+| `game-ideator` | D&D module import dominates | Add non-tabletop ideation modes |
+| `world-builder` | Location services hardcoded (shop/inn/blacksmith) | Make services configurable per genre |
+
+These revisions are not required to use the template — the generic skills work fine for any game. The RPG pipeline skills simply won't be invoked for non-RPG projects.
+
+---
+
 ## Conventions
 
 ### File Naming
