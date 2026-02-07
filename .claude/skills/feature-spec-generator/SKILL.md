@@ -14,6 +14,15 @@ allowed-tools:
 
 This skill generates comprehensive feature specifications using the project's standardized template, with context from the prototype GDD and development roadmap to ensure alignment with game vision, design pillars, and project priorities.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | design-lead |
+| **Sprint Phase** | Phase A (Spec) |
+| **Directory Scope** | `docs/features/` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ## When to Use This Skill
 
 Invoke this skill when the user:

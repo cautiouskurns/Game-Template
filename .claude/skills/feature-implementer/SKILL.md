@@ -21,6 +21,15 @@ This skill takes a feature specification from `docs/features/` and implements it
 - **What the player should now see** (visible differences, new UI, behaviors)
 - **How to test the implementation** (step-by-step verification)
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | systems-dev, gameplay-dev, ui-dev |
+| **Sprint Phase** | Phase B (Implementation) |
+| **Directory Scope** | Agent's own directories |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ## When to Use This Skill
 
 Invoke this skill when the user:

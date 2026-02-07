@@ -13,6 +13,15 @@ allowed-tools:
 
 This skill provides guidance on git workflows, commit strategies, branch management, and resolving common version control issues for game development projects.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | qa-docs |
+| **Sprint Phase** | Any phase when git workflow questions arise |
+| **Directory Scope** | N/A (advisory) |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ---
 
 ## When to Use This Skill

@@ -17,6 +17,15 @@ allowed-tools:
 
 This skill creates and maintains a comprehensive Architecture Document that visualizes scene trees, tracks data structures, maps system hierarchies, and provides a structural overview of the entire game.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | qa-docs |
+| **Sprint Phase** | End of sprint |
+| **Directory Scope** | `docs/architecture.md` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ## When to Use This Skill
 
 Invoke this skill when the user:

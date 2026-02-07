@@ -1,5 +1,17 @@
 # Campaign Creator Skill
 
+> **RPG Pipeline Only** — This skill creates campaign data files that tie together worldmaps, characters, quests, and encounters into playable RPG campaigns. For non-RPG games, the content-architect should create simpler level/progression data suited to the game's needs. The iterative MINIMAL → UPDATE → FINALIZE workflow pattern applies broadly.
+
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | content-architect |
+| **Sprint Phase** | Phase B (Implementation) — used iteratively throughout development |
+| **Directory Scope** | `data/campaigns/` |
+| **Genre** | RPG / CRPG only |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 This skill creates **campaign data files** (`.json`) that tie together all game content - worldmaps, characters, quests, dialogues, and encounters - into a playable campaign.
 
 **Output:** `data/campaigns/[campaign_id].json`

@@ -16,6 +16,15 @@ allowed-tools:
 
 This skill generates structured, moderate-detail specifications for development tools, editor plugins, and standalone utilities. Keeps specs concise (~1-2 pages) while capturing enough detail to guide implementation.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | design-lead |
+| **Sprint Phase** | Phase A (Spec) |
+| **Directory Scope** | `docs/tools/` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ## When to Use This Skill
 
 Invoke this skill when the user:

@@ -13,6 +13,15 @@ allowed-tools:
 
 This skill generates comprehensive Game Design Documents for full production games, covering all systems, content, progression, monetization, and long-term design vision.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | design-lead |
+| **Sprint Phase** | Production lifecycle start |
+| **Directory Scope** | `docs/*-gdd.md` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ---
 
 ## When to Use This Skill

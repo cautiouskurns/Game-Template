@@ -15,6 +15,15 @@ allowed-tools:
 
 This skill creates and maintains CHANGELOG.md files following best practices, tracking all development progress, features, bug fixes, and breaking changes.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | qa-docs |
+| **Sprint Phase** | End of sprint (Phase D) |
+| **Directory Scope** | `CHANGELOG.md` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ---
 
 ## When to Use This Skill

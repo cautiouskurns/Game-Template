@@ -18,6 +18,15 @@ allowed-tools:
 
 This skill analyzes error screenshots to fix the immediate issue and proactively identify related errors that might emerge, reducing the need for repeated debugging cycles.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agents** | systems-dev, gameplay-dev, ui-dev |
+| **Sprint Phase** | Phase B (Implementation) — used whenever runtime errors occur |
+| **Directory Scope** | Agent's own directories only |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ## When to Use This Skill
 
 Invoke this skill when the user:

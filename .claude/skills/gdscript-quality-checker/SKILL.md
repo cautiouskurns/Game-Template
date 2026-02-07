@@ -15,6 +15,15 @@ allowed-tools:
 
 This skill analyzes GDScript files to identify code quality issues, Godot-specific anti-patterns, performance problems, and refactoring opportunities.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | qa-docs |
+| **Sprint Phase** | Phase C (QA) |
+| **Directory Scope** | Reviews all `scripts/` directories |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ## When to Use This Skill
 
 Invoke this skill when the user:

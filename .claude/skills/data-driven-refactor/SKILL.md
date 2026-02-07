@@ -15,6 +15,15 @@ allowed-tools:
 
 This skill analyzes GDScript code to identify hardcoded configuration data that should be extracted into external data files for easier tuning, balancing, and management.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | qa-docs |
+| **Sprint Phase** | Phase C (QA) after 3+ features |
+| **Directory Scope** | `docs/data-analysis/` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ## When to Use This Skill
 
 Invoke this skill when the user:

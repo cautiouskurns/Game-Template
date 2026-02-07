@@ -13,6 +13,15 @@ allowed-tools:
 
 This skill **stress-tests game concepts** by analyzing technical feasibility, identifying scope risks, and providing realistic assessments based on similar games and industry patterns.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | design-lead |
+| **Sprint Phase** | Pre-sprint ideation |
+| **Directory Scope** | `docs/ideas/` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ---
 
 ## When to Use This Skill

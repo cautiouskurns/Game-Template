@@ -12,6 +12,15 @@ allowed-tools:
 
 This skill generates comprehensive Game Design Documents for prototype games through an **interactive questioning process**, then outputs a structured markdown document following industry-standard prototype GDD format.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | design-lead |
+| **Sprint Phase** | Prototype lifecycle start |
+| **Directory Scope** | `docs/*-gdd.md` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ---
 
 ## When to Use This Skill

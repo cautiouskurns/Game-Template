@@ -18,6 +18,15 @@ allowed-tools:
 
 This skill implements individual features from tool roadmaps, understanding the architecture of Godot editor plugins, standalone tools, and CLI utilities. Takes a feature from a roadmap and builds it completely.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | systems-dev |
+| **Sprint Phase** | Phase B (Implementation) |
+| **Directory Scope** | `addons/`, `scripts/systems/` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ## When to Use This Skill
 
 Invoke this skill when the user:

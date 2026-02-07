@@ -1,5 +1,18 @@
 # Test Campaign Generator Skill
 
+> **RPG Pipeline Only** — This skill generates campaign specification documents (markdown) using a CRPG engine content manifest format with locations, NPCs, enemies, quests, dialogues, encounters, and interior grid layouts. For non-RPG games, the content-architect should create simpler level/content specifications suited to the game's needs. The tiered complexity approach and spec-then-scaffold workflow pattern apply broadly.
+
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | content-architect |
+| **Sprint Phase** | Phase B (Implementation) — used to plan bulk content creation |
+| **Directory Scope** | `docs/test-campaigns/` (specs only, no data files) |
+| **Genre** | RPG / CRPG only |
+| **Schema Dependency** | References all CRPG engine schemas (character, quest, dialogue, encounter) |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 This skill generates **SPECIFICATION DOCUMENTS ONLY** - markdown files that describe test campaign content. It does NOT create JSON files or any game data files.
 
 ---

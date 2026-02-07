@@ -1,5 +1,18 @@
 # Encounter Designer Skill
 
+> **RPG Pipeline Only** — This skill creates combat encounter data files using a CRPG engine encounter schema with enemy composition, victory/defeat conditions, environmental hazards, and loot tables. For non-RPG games, adapt the encounter structure to your game's challenge system. The encounter design methodology applies broadly to any game with structured challenges.
+
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | content-architect |
+| **Sprint Phase** | Phase B (Implementation) — parallel with developer agents |
+| **Directory Scope** | `data/encounters/` |
+| **Genre** | RPG / CRPG only |
+| **Schema Dependency** | Requires `crpg_engine/schemas/encounter_schema.json` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 This skill creates **encounter data files (.json)** that define combat encounters, boss fights, ambushes, and other challenge events. It generates balanced encounters with appropriate enemies, rewards, and conditions that integrate with quests and the world.
 
 **IMPORTANT:** This skill generates encounter files that conform to the official schema at:

@@ -1,5 +1,19 @@
 # Test Campaign Scaffolder Skill
 
+> **RPG Pipeline Only** — This skill creates actual data files (JSON, `.char`, `.dtree`, `.worldmap.json`) from a CRPG engine campaign specification. It generates characters with RPG stats, dialogue trees with skill checks, quest files with objectives, encounter files with enemy composition, and worldmaps with interior grid layouts. For non-RPG games, the content-architect should create simpler data files suited to the game's needs. The spec-driven scaffolding workflow pattern applies broadly.
+
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | content-architect |
+| **Sprint Phase** | Phase B (Implementation) — used for bulk file generation from specs |
+| **Directory Scope** | `data/` (all subdirectories: campaigns, world, characters, dialogue, encounters, quests) |
+| **Genre** | RPG / CRPG only |
+| **Schema Dependency** | Requires all CRPG engine schemas (character, quest, dialogue, encounter) |
+| **Prerequisite** | Requires a spec file from `test-campaign-generator` in `docs/test-campaigns/` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 This skill **CREATES ACTUAL DATA FILES** from a test campaign specification. It reads a spec document from `docs/test-campaigns/` and generates all the JSON, .char, .dtree, and worldmap files needed, **including full interior grid layouts with NPC placements**.
 
 ---

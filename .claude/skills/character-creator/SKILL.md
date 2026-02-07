@@ -1,5 +1,18 @@
 # Character Creator Skill
 
+> **RPG Pipeline Only** — This skill creates structured character data files using a CRPG engine schema (`.char` format with stats, factions, tiers). For non-RPG games, the content-architect should create simpler JSON character definitions suited to the game's needs. The interactive workflow and data organization principles still apply.
+
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | content-architect |
+| **Sprint Phase** | Phase B (Implementation) — parallel with developer agents |
+| **Directory Scope** | `data/characters/` |
+| **Genre** | RPG / CRPG only |
+| **Schema Dependency** | Requires `crpg_engine/schemas/character_schema.json` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 This skill creates **character data files** (`.char`) for the CRPG Engine. It defines NPCs, companions, enemies, and player characters with their identity, appearance, personality, stats, and relationships.
 
 **Schema Reference:** `crpg_engine/schemas/character_schema.json`

@@ -13,6 +13,15 @@ allowed-tools:
 
 This skill takes a validated prototype GDD and expands it into a comprehensive vertical slice GDD, defining the polished, representative experience that demonstrates final game quality.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | design-lead |
+| **Sprint Phase** | Vertical Slice lifecycle start |
+| **Directory Scope** | `docs/*-gdd.md` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ---
 
 ## When to Use This Skill

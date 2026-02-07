@@ -12,6 +12,15 @@ allowed-tools:
 
 This skill generates game concepts through an **interactive questioning process** to understand user constraints, then produces 3-5 viable game ideas with detailed core loop descriptions.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | design-lead |
+| **Sprint Phase** | Pre-sprint ideation |
+| **Directory Scope** | `docs/ideas/` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ---
 
 ## When to Use This Skill

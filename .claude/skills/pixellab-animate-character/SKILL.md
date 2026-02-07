@@ -15,6 +15,15 @@ allowed-tools:
 
 This skill adds animations to existing PixelLab characters through an **interactive selection process**, offering categorized animation templates and custom action support.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | asset-artist |
+| **Sprint Phase** | Phase B (Implementation) |
+| **Directory Scope** | `assets/sprites/` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ---
 
 ## When to Use This Skill

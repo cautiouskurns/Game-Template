@@ -14,6 +14,15 @@ allowed-tools:
 
 This skill creates and maintains a comprehensive Game Design Bible that captures the creative vision, design philosophy, and guiding principles for the entire project.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | design-lead |
+| **Sprint Phase** | Phase A (Spec) and end-of-sprint |
+| **Directory Scope** | `docs/design-bible.md` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ---
 
 ## When to Use This Skill

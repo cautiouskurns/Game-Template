@@ -7,6 +7,15 @@ trigger: user
 
 You are bootstrapping a new game project from the agent team template repository.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | Any (typically run by user directly) |
+| **Sprint Phase** | Pre-sprint — one-time project setup |
+| **Directory Scope** | Entire project root |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ## How to Invoke This Skill
 
 Users can trigger this skill by saying:

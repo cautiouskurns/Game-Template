@@ -14,6 +14,15 @@ allowed-tools:
 
 This skill analyzes Godot scene files (.tscn) to identify structural issues, performance bottlenecks, and optimization opportunities specific to Godot 4.x projects.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agents** | gameplay-dev, ui-dev |
+| **Sprint Phase** | Phase B (Implementation) and Phase C (QA) |
+| **Directory Scope** | `scenes/gameplay/`, `scenes/levels/` (gameplay-dev) or `scenes/ui/` (ui-dev) |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ## When to Use This Skill
 
 Invoke this skill when the user:

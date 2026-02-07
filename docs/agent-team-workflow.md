@@ -1228,9 +1228,32 @@ Tower Defense content-architect might create:
 
 The directory ownership (`data/`) and the role (structured game data) remain the same — only the skills and schemas change.
 
-### Skills That Need Revision
+### Skill Audit Log
 
-The following skills would benefit from genre-agnostic revisions to make the template truly universal:
+**Audit date:** 2026-02-07
+
+#### Removed Skills
+
+| Skill | Reason |
+|-------|--------|
+| `figma-prompt-generator` | Redundant — built-in Figma MCP `implement-design` skill handles this |
+| `figma-visual-updater` | Redundant — built-in Figma MCP `implement-design` skill handles this |
+| `godot-project-setup` | Superseded by `project-bootstrap` skill |
+| `PIXELART_PIPELINE_CONTEXT.md` | Documentation file, not a skill; CRPG-engine-specific |
+
+#### Conformance Updates
+
+All remaining skills now include a **Workflow Context** header specifying:
+- Agent assignment (which agent uses the skill)
+- Sprint phase (when in the workflow the skill is invoked)
+- Directory scope (what directories the skill operates on)
+- Workflow reference (link to this document)
+
+RPG-pipeline skills additionally include a **genre warning banner** clearly marking them as CRPG-specific with guidance on what to use instead for non-RPG games.
+
+#### Future Revisions (Nice-to-Have)
+
+These generic skills would benefit from diversified examples but work fine as-is:
 
 | Skill | Issue | Recommended Fix |
 |-------|-------|----------------|
@@ -1240,7 +1263,7 @@ The following skills would benefit from genre-agnostic revisions to make the tem
 | `game-ideator` | D&D module import dominates | Add non-tabletop ideation modes |
 | `world-builder` | Location services hardcoded (shop/inn/blacksmith) | Make services configurable per genre |
 
-These revisions are not required to use the template — the generic skills work fine for any game. The RPG pipeline skills simply won't be invoked for non-RPG projects.
+These revisions are not blocking — the generic skills work fine for any game. The RPG pipeline skills simply won't be invoked for non-RPG projects.
 
 ---
 

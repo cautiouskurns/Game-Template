@@ -23,6 +23,15 @@ allowed-tools:
 
 This skill takes the **foundational documents** from `game-ideator` and expands them into **detailed narrative specifications** that downstream skills (quest-designer, dialogue-designer, character-creator) can use to create consistent content.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | design-lead |
+| **Sprint Phase** | Phase A (Spec) |
+| **Directory Scope** | `docs/` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ---
 
 ## Skill Hierarchy Position

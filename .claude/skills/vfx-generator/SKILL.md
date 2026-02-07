@@ -17,6 +17,17 @@ allowed-tools:
 
 This skill generates complete, game-ready VFX scenes for Godot 4.x using **NO custom art assets**. All effects use ColorRect, GPUParticles2D, Line2D, shaders, and procedural techniques to create professional-looking visual effects.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agents** | gameplay-dev |
+| **Sprint Phase** | Phase B (Implementation) |
+| **Directory Scope** | `scenes/gameplay/` (VFX scenes attached to gameplay entities) |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
+> **Genre Note:** The templates and color palettes below use RPG examples (fireballs, healing circles) but the techniques apply to ANY genre. Adapt the effect types and color language to your game's needs.
+
 ## When to Use This Skill
 
 Invoke this skill when the user:
@@ -86,7 +97,7 @@ The secret to great VFX without art is:
 
 ### 3. Six Core Templates
 
-Use these 6 templates for 95% of CRPG effects:
+Use these 6 templates for 95% of game effects:
 
 1. **PROJECTILE** - Moves forward, spawns impact on collision
 2. **IMPACT** - Burst effect, camera shake, auto-destroys
@@ -97,8 +108,10 @@ Use these 6 templates for 95% of CRPG effects:
 
 ### 4. File Structure Convention
 
+**Note:** VFX scenes belong in `scenes/gameplay/vfx/` under gameplay-dev's ownership.
+
 ```
-res://vfx/
+scenes/gameplay/vfx/
 ├── projectiles/
 │   ├── fireball.tscn
 │   ├── ice_shard.tscn

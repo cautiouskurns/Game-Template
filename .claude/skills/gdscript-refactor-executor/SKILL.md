@@ -16,6 +16,15 @@ allowed-tools:
 
 This skill executes code quality refactorings based on recommendations from `gdscript-quality-checker` reports.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | systems-dev, gameplay-dev, ui-dev |
+| **Sprint Phase** | Phase B after QA review |
+| **Directory Scope** | Agent's own directories |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ## When to Use This Skill
 
 Invoke this skill when the user:

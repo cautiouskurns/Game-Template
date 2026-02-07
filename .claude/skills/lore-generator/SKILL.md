@@ -16,6 +16,17 @@ allowed-tools:
 
 This skill generates comprehensive, consistent lore entries for the game world, maintaining narrative coherence across all lore types while respecting the established tone, timeline, and world rules.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | content-architect |
+| **Sprint Phase** | Phase B (Implementation) |
+| **Directory Scope** | `data/world/`, `docs/` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
+> **Genre Note:** RPG-biased examples but lore generation applies to any narrative game.
+
 ---
 
 ## When to Use This Skill

@@ -14,6 +14,15 @@ allowed-tools:
 
 This skill reads a production GDD and generates a comprehensive implementation roadmap for indie game development. It organizes work into logical phases, lists all features per phase, and provides mid-detail specifications for each feature—enough to start implementing without needing a separate feature spec document.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | design-lead |
+| **Sprint Phase** | Production lifecycle planning |
+| **Directory Scope** | `docs/` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ---
 
 ## When to Use This Skill

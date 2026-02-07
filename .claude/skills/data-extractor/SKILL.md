@@ -16,6 +16,15 @@ allowed-tools:
 
 This skill executes data-driven refactorings based on recommendations from `data-driven-refactor` reports.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | qa-docs (with user confirmation) |
+| **Sprint Phase** | Phase C (QA) |
+| **Directory Scope** | `docs/data-analysis/` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ## When to Use This Skill
 
 Invoke this skill when the user:

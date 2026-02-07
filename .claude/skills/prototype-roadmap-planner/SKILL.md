@@ -14,6 +14,15 @@ allowed-tools:
 
 This skill reads a prototype GDD and generates a detailed implementation roadmap. It extracts implementation phases from the GDD, breaks down each phase into concrete tasks, and creates a day-by-day or hour-by-hour development plan for rapid prototyping.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | design-lead |
+| **Sprint Phase** | Prototype lifecycle planning |
+| **Directory Scope** | `docs/` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ---
 
 ## When to Use This Skill

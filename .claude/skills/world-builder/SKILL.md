@@ -4,6 +4,17 @@ This skill creates **worldmap data files** (`.worldmap.json`) for the CRPG Engin
 
 **Schema Reference:** `crpg_engine/schemas/worldmap_schema.json`
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | content-architect |
+| **Sprint Phase** | Phase B (Implementation) |
+| **Directory Scope** | `data/world/` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
+> **Genre Note:** RPG-biased examples but the location/connection data structure concept applies to any game with a world map.
+
 ---
 
 ## Skill Hierarchy Position

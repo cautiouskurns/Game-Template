@@ -14,6 +14,15 @@ allowed-tools:
 
 This skill reads a vertical slice GDD and generates a phased implementation roadmap. It extracts all features from the GDD, organizes them into logical phases based on dependencies, and outputs high-level feature descriptions. These features can then be turned into detailed specs using `feature-spec-generator`.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | design-lead |
+| **Sprint Phase** | Vertical Slice lifecycle planning |
+| **Directory Scope** | `docs/` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ---
 
 ## When to Use This Skill

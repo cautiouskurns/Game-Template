@@ -16,6 +16,15 @@ allowed-tools:
 
 This skill creates phased implementation roadmaps for development tools. Takes a tool spec and breaks it into concrete, actionable phases with clear deliverables. No time estimates - just logical sequencing.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | design-lead |
+| **Sprint Phase** | Tool development planning |
+| **Directory Scope** | `docs/tools/` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ## When to Use This Skill
 
 Invoke this skill when the user:

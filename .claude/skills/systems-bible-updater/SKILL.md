@@ -16,6 +16,15 @@ allowed-tools:
 
 This skill creates and maintains a comprehensive Systems Bible that documents all technical systems, their architectures, APIs, data flows, and implementation details.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | qa-docs |
+| **Sprint Phase** | End of sprint |
+| **Directory Scope** | `docs/systems-bible.md` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ---
 
 ## When to Use This Skill

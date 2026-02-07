@@ -17,6 +17,15 @@ allowed-tools:
 
 This skill creates pixel art characters using the PixelLab MCP service through an **interactive questioning process**, ensuring art style consistency with the Blood & Gold project.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | asset-artist |
+| **Sprint Phase** | Phase B (Implementation) |
+| **Directory Scope** | `assets/sprites/` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ---
 
 ## When to Use This Skill

@@ -1,5 +1,18 @@
 # Dialogue Designer Skill
 
+> **RPG Pipeline Only** — This skill creates dialogue tree files (`.dtree`) using a CRPG engine dialogue schema with specific node types (Speaker, Choice, Branch, SkillCheck, Quest, Item, etc.). For non-RPG games, adapt the dialogue structure to your game's needs. The voice-matching methodology and branching design principles apply broadly.
+
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | content-architect |
+| **Sprint Phase** | Phase B (Implementation) — parallel with developer agents |
+| **Directory Scope** | `data/dialogue/` |
+| **Genre** | RPG / CRPG only |
+| **Schema Dependency** | Requires `crpg_engine/schemas/dialogue_schema.json` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 This skill creates **dialogue tree files (.dtree)** that match character voices and support narrative goals. It reads character profiles for voice consistency and generates dialogues that integrate with the game's quest and flag systems.
 
 **IMPORTANT:** This skill generates .dtree files that conform to the official schema at:

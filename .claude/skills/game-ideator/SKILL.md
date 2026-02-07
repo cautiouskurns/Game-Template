@@ -20,6 +20,15 @@ This skill establishes the **foundational creative vision** for a game through *
 
 **Key Capability:** Accepts input in multiple formats (structured tables, JSON, bullet lists, conversational Q&A) from multiple sources (reference materials, original creation, templates). The user chooses how they want to provide information.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | design-lead |
+| **Sprint Phase** | Pre-sprint / Phase A (Spec) |
+| **Directory Scope** | `docs/ideas/` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ---
 
 ## CRITICAL: What This Skill Does and Does NOT Do

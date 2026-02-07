@@ -14,6 +14,15 @@ allowed-tools:
 
 This skill takes rough, vague feature ideas and refines them through **interactive Q&A** into a structured **Feature Idea Brief** that serves as input for the Feature Spec Generator.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | design-lead |
+| **Sprint Phase** | Phase A (Spec) |
+| **Directory Scope** | `docs/ideas/`, `docs/features/` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ---
 
 ## When to Use This Skill

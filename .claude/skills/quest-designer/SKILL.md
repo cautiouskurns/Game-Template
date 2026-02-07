@@ -1,5 +1,18 @@
 # Quest Designer Skill
 
+> **RPG Pipeline Only** — This skill creates quest data files using a CRPG engine quest schema with objectives, prerequisites, journal entries, and branching outcomes. For non-RPG games, use simpler mission/objective data structures. The quest design methodology (objectives, rewards, prerequisites) applies broadly.
+
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | content-architect |
+| **Sprint Phase** | Phase B (Implementation) — parallel with developer agents |
+| **Directory Scope** | `data/quests/` |
+| **Genre** | RPG / CRPG only |
+| **Schema Dependency** | Requires `crpg_engine/schemas/quest_schema.json` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 This skill creates **quest data files (.json)** that integrate objectives, dialogues, encounters, and rewards into cohesive gameplay experiences. It reads narrative documents for story context and generates quests that conform to the engine's schema.
 
 **IMPORTANT:** This skill generates quest files that conform to the official schema at:

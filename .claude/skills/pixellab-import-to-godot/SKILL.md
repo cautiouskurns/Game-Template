@@ -19,6 +19,15 @@ allowed-tools:
 
 This skill imports PixelLab-generated characters into a Godot project with proper folder organization, consistent naming, and metadata tracking for asset management.
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | asset-artist |
+| **Sprint Phase** | Phase B (Implementation) |
+| **Directory Scope** | `assets/sprites/` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ---
 
 ## When to Use This Skill

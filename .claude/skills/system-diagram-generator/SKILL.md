@@ -16,6 +16,15 @@ allowed_tools:
 
 Analyzes game systems and code structure to create visual diagrams (Mermaid and ASCII).
 
+## Workflow Context
+
+| Field | Value |
+|-------|-------|
+| **Assigned Agent** | qa-docs |
+| **Sprint Phase** | End of sprint |
+| **Directory Scope** | `docs/` |
+| **Workflow Reference** | See `docs/agent-team-workflow.md` |
+
 ## When to Use This Skill
 
 Use this skill when the user requests:
