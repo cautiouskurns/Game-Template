@@ -1,0 +1,53 @@
+{
+  "$schema": "character-meta-schema.json",
+  "schema_version": "1.0",
+  "character": {
+    "id": "",
+    "display_name": "",
+    "pixellab_id": "",
+    "pixellab_name": "",
+    "description": ""
+  },
+  "source": {
+    "generator": "pixellab",
+    "created_date": "",
+    "imported_date": "",
+    "last_updated": ""
+  },
+  "art_status": {
+    "type": "placeholder",
+    "quality": "ai_generated",
+    "ready_for_production": false,
+    "notes": "",
+    "artist": null,
+    "review_date": null
+  },
+  "technical": {
+    "canvas_size": 64,
+    "character_height_approx": 38,
+    "directions": 8,
+    "view": "low top-down",
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "detail": "medium detail",
+    "proportions": "default"
+  },
+  "animations": [],
+  "files": {
+    "base_sprites": [],
+    "animation_folders": [],
+    "sprite_sheets": [],
+    "godot_resources": []
+  },
+  "classification": {
+    "role": "",
+    "faction": null,
+    "enemy_type": null,
+    "tags": []
+  },
+  "game_data": {
+    "entity_id": null,
+    "linked_data_file": null,
+    "notes": ""
+  }
+}

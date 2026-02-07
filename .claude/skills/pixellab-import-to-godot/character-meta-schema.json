@@ -1,0 +1,233 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "pixellab-character-meta-schema",
+  "title": "Character Metadata",
+  "description": "Schema for individual character metadata files (_meta.json)",
+  "type": "object",
+  "required": ["schema_version", "character", "source", "art_status", "technical"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+$"
+    },
+    "character": {
+      "type": "object",
+      "required": ["id", "display_name"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$",
+          "description": "Unique character identifier"
+        },
+        "display_name": {
+          "type": "string",
+          "description": "Human-readable name"
+        },
+        "pixellab_id": {
+          "type": "string",
+          "description": "UUID from PixelLab"
+        },
+        "pixellab_name": {
+          "type": "string",
+          "description": "Original name in PixelLab"
+        },
+        "description": {
+          "type": "string",
+          "description": "Character description/prompt used"
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": ["generator"],
+      "properties": {
+        "generator": {
+          "type": "string",
+          "enum": ["pixellab", "hand_drawn", "other"],
+          "description": "How the art was created"
+        },
+        "created_date": {
+          "type": "string",
+          "format": "date",
+          "description": "When art was originally created"
+        },
+        "imported_date": {
+          "type": "string",
+          "format": "date",
+          "description": "When imported to project"
+        },
+        "last_updated": {
+          "type": "string",
+          "format": "date",
+          "description": "Last modification date"
+        }
+      }
+    },
+    "art_status": {
+      "type": "object",
+      "required": ["type", "quality"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["placeholder", "placeholder_approved", "wip", "final", "legacy"],
+          "description": "Current status of the art asset"
+        },
+        "quality": {
+          "type": "string",
+          "enum": ["ai_generated", "ai_touched_up", "hand_drawn_rough", "hand_drawn_polished"],
+          "description": "Quality level of the art"
+        },
+        "ready_for_production": {
+          "type": "boolean",
+          "description": "Whether this art can ship in a release build"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Notes about art status or needed changes"
+        },
+        "artist": {
+          "type": ["string", "null"],
+          "description": "Artist name if hand-drawn"
+        },
+        "review_date": {
+          "type": ["string", "null"],
+          "format": "date",
+          "description": "Date art was reviewed/approved"
+        }
+      }
+    },
+    "technical": {
+      "type": "object",
+      "required": ["canvas_size", "directions"],
+      "properties": {
+        "canvas_size": {
+          "type": "integer",
+          "minimum": 16,
+          "maximum": 256,
+          "description": "Canvas size in pixels"
+        },
+        "character_height_approx": {
+          "type": "integer",
+          "description": "Approximate character height in pixels"
+        },
+        "directions": {
+          "type": "integer",
+          "enum": [4, 8],
+          "description": "Number of directional views"
+        },
+        "view": {
+          "type": "string",
+          "enum": ["low top-down", "high top-down", "side"],
+          "description": "Camera perspective"
+        },
+        "outline": {
+          "type": "string",
+          "description": "Outline style used"
+        },
+        "shading": {
+          "type": "string",
+          "description": "Shading style used"
+        },
+        "detail": {
+          "type": "string",
+          "description": "Detail level"
+        },
+        "proportions": {
+          "type": "string",
+          "description": "Body proportion preset"
+        }
+      }
+    },
+    "animations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Animation name (e.g., 'idle', 'walk')"
+          },
+          "template": {
+            "type": "string",
+            "description": "PixelLab template used"
+          },
+          "frame_count": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "fps_recommended": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 60
+          },
+          "loop": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "files": {
+      "type": "object",
+      "properties": {
+        "base_sprites": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of base direction sprite files"
+        },
+        "animation_folders": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of animation folder names"
+        },
+        "sprite_sheets": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of sprite sheet files"
+        },
+        "godot_resources": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of generated Godot resources (.tres)"
+        }
+      }
+    },
+    "classification": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "type": "string",
+          "enum": ["player", "companion", "npc", "enemy_standard", "enemy_elite", "boss", "faction_unit"]
+        },
+        "faction": {
+          "type": ["string", "null"]
+        },
+        "enemy_type": {
+          "type": ["string", "null"],
+          "description": "Enemy subcategory (bandits, undead, beasts, etc.)"
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "game_data": {
+      "type": "object",
+      "description": "Links to game data files",
+      "properties": {
+        "entity_id": {
+          "type": ["string", "null"],
+          "description": "ID in game entity system"
+        },
+        "linked_data_file": {
+          "type": ["string", "null"],
+          "description": "Path to related data file"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "$schema": "manifest-schema.json",
+  "schema_version": "1.0",
+  "project": "crpg-engine",
+  "last_updated": "2025-01-25T00:00:00Z",
+  "statistics": {
+    "total_characters": 0,
+    "by_art_status": {
+      "placeholder": 0,
+      "placeholder_approved": 0,
+      "wip": 0,
+      "final": 0
+    },
+    "by_role": {
+      "player": 0,
+      "companion": 0,
+      "npc": 0,
+      "enemy_standard": 0,
+      "enemy_elite": 0,
+      "boss": 0
+    },
+    "by_generator": {
+      "pixellab": 0,
+      "hand_drawn": 0,
+      "other": 0
+    }
+  },
+  "characters": []
+}

@@ -4,6 +4,74 @@ A structured approach to AI-assisted game development using coordinated agent te
 
 ---
 
+## Starting a New Project
+
+This workflow is deployed as a **GitHub template repository**. To start a new game project:
+
+### Step 1: Create from Template
+
+```bash
+# Option A: Via GitHub CLI
+gh repo create my-new-game --template YOUR_USERNAME/godot-agent-team-template --clone
+cd my-new-game
+
+# Option B: Via GitHub web UI
+# Click "Use this template" on the template repo page, then clone
+```
+
+### Step 2: Open in Claude Code
+
+```bash
+claude
+```
+
+### Step 3: Run Bootstrap
+
+```
+/project-bootstrap
+```
+
+The bootstrap skill will:
+1. Ask for your game's name, resolution, and 2D/3D preference
+2. Verify all template files are present (agents, skills, workflow doc, CLAUDE.md)
+3. Update `project.godot` and `CLAUDE.md` with your project name
+4. Create the full directory structure per the ownership map
+5. Remove template git history and initialize a fresh repo
+6. Create the initial commit
+
+### Step 4: Begin Phase 0
+
+After bootstrap completes, start the design pipeline:
+1. Run `game-concept-generator` (or bring your own concept)
+2. Follow the Phase 0 pipeline through to Sprint 1 feature specs
+3. Every step pauses for your approval
+
+### What the Template Contains
+
+```
+template-repo/
+├── .claude/
+│   ├── agents/           ← 7 agent role definitions
+│   ├── skills/           ← 46 game development skills
+│   └── settings.local.json ← MCP permissions (Ludo, Epidemic Sound)
+├── docs/
+│   └── agent-team-workflow.md ← This document
+├── CLAUDE.md             ← Project context (customized by bootstrap)
+├── project.godot         ← Godot config (customized by bootstrap)
+├── .gitignore
+├── .gitattributes
+└── .editorconfig
+```
+
+### Updating the Template
+
+When you improve the workflow, agents, or skills during a project:
+1. Copy the improved files back to the template repo
+2. Commit and push to the template
+3. Future projects get the improvements automatically
+
+---
+
 ## Development Lifecycle
 
 Development progresses through three phases, each ending with a **user go/no-go gate**. Nothing advances to the next phase without explicit user approval.
@@ -757,6 +825,9 @@ Follow Conventional Commits:
 - `main` — stable, playable builds only
 - `sprint/N-description` — sprint work branch
 - Feature branches off sprint branch if needed
+
+### Git Initialization
+Git is initialized automatically by the `project-bootstrap` skill. The initial commit includes all template files. Each sprint should work on a `sprint/N-description` branch merged to `main` at the end of each sprint review (Phase D), after user approval.
 
 ---
 

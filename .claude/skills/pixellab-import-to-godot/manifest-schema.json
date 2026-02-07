@@ -1,0 +1,113 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "pixellab-manifest-schema",
+  "title": "PixelLab Asset Manifest",
+  "description": "Schema for tracking imported PixelLab characters in a Godot project",
+  "type": "object",
+  "required": ["schema_version", "characters"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "description": "Version of the manifest schema",
+      "pattern": "^\\d+\\.\\d+$"
+    },
+    "project": {
+      "type": "string",
+      "description": "Project name for reference"
+    },
+    "last_updated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of last manifest update"
+    },
+    "statistics": {
+      "type": "object",
+      "description": "Aggregate statistics for quick reference",
+      "properties": {
+        "total_characters": { "type": "integer", "minimum": 0 },
+        "by_art_status": {
+          "type": "object",
+          "properties": {
+            "placeholder": { "type": "integer", "minimum": 0 },
+            "placeholder_approved": { "type": "integer", "minimum": 0 },
+            "wip": { "type": "integer", "minimum": 0 },
+            "final": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "by_role": {
+          "type": "object",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        },
+        "by_generator": {
+          "type": "object",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "characters": {
+      "type": "array",
+      "description": "List of all imported characters",
+      "items": {
+        "type": "object",
+        "required": ["id", "path", "display_name", "role", "art_status"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the character (folder name)",
+            "pattern": "^[a-z0-9_]+$"
+          },
+          "path": {
+            "type": "string",
+            "description": "Relative path from assets/sprites/characters/"
+          },
+          "pixellab_id": {
+            "type": "string",
+            "description": "UUID from PixelLab API"
+          },
+          "display_name": {
+            "type": "string",
+            "description": "Human-readable name"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["player", "companion", "npc", "enemy_standard", "enemy_elite", "boss", "faction_unit"],
+            "description": "Character role/category"
+          },
+          "art_status": {
+            "type": "string",
+            "enum": ["placeholder", "placeholder_approved", "wip", "final", "legacy"],
+            "description": "Current art asset status"
+          },
+          "directions": {
+            "type": "integer",
+            "enum": [4, 8],
+            "description": "Number of directional sprites"
+          },
+          "canvas_size": {
+            "type": "integer",
+            "description": "Canvas size in pixels"
+          },
+          "animations": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "List of animation names available"
+          },
+          "tags": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Searchable tags for filtering"
+          },
+          "faction": {
+            "type": "string",
+            "description": "Faction affiliation if applicable"
+          },
+          "imported_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Date character was imported"
+          }
+        }
+      }
+    }
+  }
+}
