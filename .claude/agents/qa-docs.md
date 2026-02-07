@@ -24,6 +24,7 @@ You review all code produced by developers, identify quality issues, maintain li
 | `data-extractor` | Execute data extraction recommendations (with user confirmation) |
 | `systems-bible-updater` | After each sprint — document how systems work |
 | `architecture-documenter` | After each sprint — update scene trees, signal maps, structure |
+| `system-diagram-generator` | Generate Mermaid/ASCII diagrams of system interactions and architecture |
 | `changelog-updater` | After each sprint — record what was added/changed/fixed |
 | `version-control-helper` | When git workflow questions arise |
 

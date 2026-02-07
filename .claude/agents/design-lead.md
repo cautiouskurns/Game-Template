@@ -24,6 +24,8 @@ Use these skills for your work:
 - `feature-spec-generator` — Write detailed feature specs from idea briefs
 - `concept-validator` — Stress-test feasibility of concepts and features
 - `game-concept-generator` — Initial ideation and concept exploration
+- `game-ideator` — Deep creative foundation and inspiration for new directions
+- `narrative-architect` — Story and character foundations that inform content-architect's data
 - `tool-spec-generator` — Write specs for development tools and editor plugins
 - `tool-roadmap-planner` — Break tool specs into phased implementation roadmaps
 

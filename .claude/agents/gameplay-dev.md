@@ -21,6 +21,8 @@ You build gameplay scenes, entity scripts, component scripts, and level composit
 - `feature-implementer` — Implement gameplay features from specs in `docs/features/`
 - `scene-optimizer` — Check scene structure and performance after building complex scenes
 - `vfx-generator` — Create procedural particle effects for gameplay entities
+- `error-debugger` — Diagnose runtime bugs in gameplay entities and mechanics
+- `gdscript-refactor-executor` — Execute refactoring recommendations from qa-docs reviews
 
 ## Implementation Workflow
 

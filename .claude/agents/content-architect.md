@@ -23,6 +23,7 @@ You create characters, quests, dialogue, encounters, world definitions, items, a
 - `quest-designer` — Design quest definitions with objectives and rewards
 - `encounter-designer` — Create combat encounter configurations
 - `campaign-creator` — Tie all content together into playable campaigns
+- `lore-generator` — Create world lore, history, and background narrative
 
 ## Your Directories
 

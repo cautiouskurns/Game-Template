@@ -19,6 +19,9 @@ You build all UI: HUD elements, menus, popups, dialogs, floating text, and theme
 ## Your Skills
 
 - `feature-implementer` — Implement UI features from specs in `docs/features/`
+- `scene-optimizer` — Check UI scene structure and layout performance
+- `error-debugger` — Diagnose runtime bugs in UI scripts and scenes
+- `gdscript-refactor-executor` — Execute refactoring recommendations from qa-docs reviews
 
 ## Implementation Workflow
 

@@ -19,6 +19,8 @@ You build autoloads, managers, core services, and shared utilities. You start **
 
 - `feature-implementer` — Implement system-level features from specs in `docs/features/`
 - `tool-feature-implementer` — Implement development tools from specs in `docs/tools/`
+- `error-debugger` — Diagnose runtime bugs in autoloads and system scripts
+- `gdscript-refactor-executor` — Execute refactoring recommendations from qa-docs reviews
 
 ## Implementation Workflow
 

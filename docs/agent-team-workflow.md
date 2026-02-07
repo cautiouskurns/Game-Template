@@ -210,6 +210,8 @@ When an agent reaches a control point, they **stop and present you with**:
 | `feature-spec-generator` | Writing detailed specs from idea briefs before each sprint's implementation |
 | `concept-validator` | Stress-testing feasibility of game concepts and features |
 | `game-concept-generator` | Initial ideation and concept exploration |
+| `game-ideator` | Deep creative foundation and inspiration when exploring new directions |
+| `narrative-architect` | Story and character foundations that inform content-architect's data files |
 | `tool-spec-generator` | Writing specifications for development tools, editor plugins, utilities |
 | `tool-roadmap-planner` | Breaking tool specs into phased implementation roadmaps |
 
@@ -245,6 +247,8 @@ Tool need → tool-spec-generator → Tool Spec (docs/tools/)
 |-------|-----------|
 | `feature-implementer` | Implementing system-level features from specs in `docs/features/` |
 | `tool-feature-implementer` | Implementing development tools from specs in `docs/tools/` |
+| `error-debugger` | Diagnosing runtime bugs in autoloads and system scripts |
+| `gdscript-refactor-executor` | Executing refactoring recommendations from qa-docs reviews |
 
 **Implementation Workflow:**
 1. Read the feature spec or tool roadmap from `docs/`
@@ -291,6 +295,8 @@ Tool need → tool-spec-generator → Tool Spec (docs/tools/)
 | `feature-implementer` | Implementing gameplay features from specs in `docs/features/` |
 | `scene-optimizer` | After building complex scenes, checking for structural/performance issues |
 | `vfx-generator` | Creating procedural particle effects for gameplay entities |
+| `error-debugger` | Diagnosing runtime bugs in gameplay entities and mechanics |
+| `gdscript-refactor-executor` | Executing refactoring recommendations from qa-docs reviews |
 
 **Implementation Workflow:**
 1. Read the feature spec from `docs/features/`
@@ -315,6 +321,9 @@ Tool need → tool-spec-generator → Tool Spec (docs/tools/)
 | Skill | When Used |
 |-------|-----------|
 | `feature-implementer` | Implementing UI features from specs in `docs/features/` |
+| `scene-optimizer` | After building complex UI scenes, checking for layout/performance issues |
+| `error-debugger` | Diagnosing runtime bugs in UI scripts and scenes |
+| `gdscript-refactor-executor` | Executing refactoring recommendations from qa-docs reviews |
 
 **Implementation Workflow:**
 1. Read the feature spec from `docs/features/`
@@ -357,6 +366,7 @@ Tool need → tool-spec-generator → Tool Spec (docs/tools/)
 | `quest-designer` | Designing quest definitions with objectives and rewards |
 | `encounter-designer` | Creating combat encounter configurations |
 | `campaign-creator` | Tying all content together into playable campaigns |
+| `lore-generator` | Creating world lore, history, and background narrative |
 
 **Workflow Pattern:** Uses `campaign-creator` iteratively:
 1. MINIMAL mode - create campaign skeleton early
@@ -424,6 +434,7 @@ Tool need → tool-spec-generator → Tool Spec (docs/tools/)
 | `data-extractor` | Execute data extraction recommendations (with confirmation) |
 | `systems-bible-updater` | After each sprint — document how systems work |
 | `architecture-documenter` | After each sprint — update scene trees, signal maps, structure |
+| `system-diagram-generator` | Generate Mermaid/ASCII diagrams of system interactions and architecture |
 | `changelog-updater` | After each sprint — record what was added/changed/fixed |
 | `version-control-helper` | When git workflow questions arise |
 
@@ -519,6 +530,59 @@ Phase D: Sprint Review (USER — all agents paused)
 
 **Phase D is mandatory.** Agents do not begin the next sprint until the user has reviewed and approved. This is the primary creative control mechanism.
 
+### Sprint Review Format (Phase D)
+
+At Phase D, the team lead compiles and presents a structured sprint summary. This is the standard format:
+
+```markdown
+# Sprint N Review: "[Deliverable Slice Name]"
+
+## Completed Features
+For each feature:
+- **Feature name** — status: COMPLETE | PARTIAL | BLOCKED
+- What was built (1-2 sentences)
+- Files created/modified (list)
+- Deviations from spec (if any, with justification)
+
+## QA Summary
+- Critical issues found: [count] — [list with severity]
+- Performance warnings: [count]
+- Code quality suggestions: [count]
+- All critical issues resolved: YES/NO
+
+## Assets Produced
+- Sprites: [list with paths]
+- Audio: [list with paths]
+- Style consistency: maintained / new reference needed
+
+## Content Produced
+- Data files created: [list with paths]
+- Campaign status: [skeleton/updated/validated]
+- Cross-reference validation: PASS/FAIL
+
+## Documentation Updated
+- Systems bible: YES/NO (what sections)
+- Architecture doc: YES/NO (what changed)
+- Changelog: YES/NO
+
+## Metrics
+- Features planned: [N] | Completed: [N] | Carried over: [N]
+- New issues discovered: [list]
+
+## Next Sprint Preview
+- Proposed deliverable: "[Player can Z]"
+- Feature specs ready: [list in docs/features/]
+- Key risks or dependencies: [list]
+
+## Questions for User
+- [Any decisions needed, ambiguities, or creative direction questions]
+```
+
+**How to use this:** The user reads the summary, playtests the build in Godot, then responds with:
+- Per-feature decisions: accept / request changes (with specifics) / reject
+- Next sprint: approve / modify scope / reorder
+- Overall direction: continue / pause / pivot
+
 ### Feature Implementation Flow (per feature, per agent)
 
 Every developer agent follows the same `feature-implementer` workflow:
@@ -568,6 +632,117 @@ qa-docs (review + documentation)
 
 ---
 
+## Team Orchestration
+
+### How Agents Are Spawned
+
+Not all 7 agents run at all times. Spawn only the agents needed for the current phase to minimize coordination overhead and cost.
+
+**Phase 0 (Pre-Sprint):** Single agent only
+```
+Spawn: design-lead
+Purpose: Run the full design pipeline (concept → bible → GDD → roadmap → specs)
+No team needed — this is sequential, interactive work with the user
+```
+
+**Phase A (Spec & Foundation):** 2-3 agents
+```
+Spawn: design-lead, systems-dev, asset-artist
+- design-lead: writes/refines feature specs (if not done in Phase 0)
+- systems-dev: implements foundation systems from approved specs
+- asset-artist: begins generating assets based on spec requirements
+```
+
+**Phase B (Implementation):** 4-5 agents
+```
+Spawn: gameplay-dev, ui-dev, content-architect, asset-artist
+Keep running: (systems-dev only if still needed)
+- gameplay-dev: implements gameplay features
+- ui-dev: implements UI features
+- content-architect: creates data files
+- asset-artist: continues generating assets
+```
+
+**Phase C (QA & Documentation):** 2-3 agents
+```
+Spawn: qa-docs
+Keep running: developers (to fix critical issues from review)
+- qa-docs: runs quality checks, updates documentation
+- developers: fix any critical issues flagged by qa-docs
+- design-lead: pipelines specs for next sprint (can run in parallel)
+```
+
+**Phase D (Sprint Review):** No agents — user only
+```
+All agents paused
+User reviews sprint summary, playtests, makes decisions
+```
+
+### Spawning Commands
+
+To create the team and spawn agents for a sprint:
+
+```
+# Create the team (once per project)
+TeamCreate: team_name="sprint-1", description="Sprint 1: Player can move through a world"
+
+# Phase A — spawn foundation agents
+Task: name="design-lead", subagent_type="general-purpose", team_name="sprint-1"
+Task: name="systems-dev", subagent_type="general-purpose", team_name="sprint-1"
+Task: name="asset-artist", subagent_type="general-purpose", team_name="sprint-1"
+
+# Phase B — spawn implementation agents (after systems-dev signals completion)
+Task: name="gameplay-dev", subagent_type="general-purpose", team_name="sprint-1"
+Task: name="ui-dev", subagent_type="general-purpose", team_name="sprint-1"
+Task: name="content-architect", subagent_type="general-purpose", team_name="sprint-1"
+
+# Phase C — spawn QA (after implementation completes)
+Task: name="qa-docs", subagent_type="general-purpose", team_name="sprint-1"
+```
+
+Each agent's prompt should reference its agent definition file:
+```
+"You are the systems-dev agent. Read .claude/agents/systems-dev.md for your full role definition,
+then read CLAUDE.md and docs/agent-team-workflow.md for project context.
+Your task for this sprint is: [specific task from sprint plan]"
+```
+
+### Task Assignment Pattern
+
+Use TaskCreate to define sprint work, then assign to agents:
+
+```
+TaskCreate: "Implement EventBus autoload" → assign to systems-dev
+TaskCreate: "Implement PlayerController" → assign to gameplay-dev
+TaskCreate: "Build HUD health bar" → assign to ui-dev
+TaskCreate: "Create goblin enemy data" → assign to content-architect
+TaskCreate: "Generate player walk spritesheet" → assign to asset-artist
+TaskCreate: "Review Sprint 1 code" → assign to qa-docs (Phase C)
+```
+
+Tasks should include:
+- Which feature spec to read (`docs/features/[name].md`)
+- Which sprint phase this belongs to (A, B, or C)
+- Dependencies on other tasks (e.g., "blocked by EventBus implementation")
+
+### Phase Transitions
+
+The team lead (you or the coordinator agent) manages phase transitions:
+
+1. **A → B:** When systems-dev messages "foundation APIs ready" and user has approved all specs
+2. **B → C:** When all Phase B tasks are marked complete
+3. **C → D:** When qa-docs finishes reviews and developers fix critical issues
+4. **D → next sprint A:** When user approves the sprint review
+
+Between sprints, shut down the current team and create a fresh one:
+```
+SendMessage: type="shutdown_request" to each agent
+TeamDelete
+TeamCreate: team_name="sprint-2", description="Sprint 2: ..."
+```
+
+---
+
 ## Quality Gates
 
 ### Mandatory Checkpoints
@@ -602,6 +777,142 @@ qa-docs runs `gdscript-quality-checker` with focus on:
 2. **Performance warnings** — fix if in hot path
 3. **Code quality suggestions** — address in refactoring sprints
 4. **Duplication analysis** — extract when pattern repeats 3+ times
+
+---
+
+## Error Recovery
+
+Things will go wrong. Here's how to handle each failure mode.
+
+### Feature Fails QA Review
+
+```
+qa-docs finds critical issues
+    ↓
+qa-docs writes review to docs/code-reviews/[feature]_review.md
+    ↓
+qa-docs sends review summary to the implementing agent (direct message)
+    ↓
+implementing agent reads review, fixes critical issues ONLY
+    ↓
+implementing agent messages qa-docs: "fixes applied, ready for re-review"
+    ↓
+qa-docs re-runs gdscript-quality-checker on modified files
+    ↓
+If PASS → feature proceeds to sprint review
+If FAIL again → escalate to user in sprint review with both the issue and attempted fix
+```
+
+**Rule:** Only critical issues block. Performance warnings and suggestions are logged but don't block the sprint. They accumulate and get addressed in dedicated refactoring sprints.
+
+### Feature Doesn't Match Spec
+
+```
+qa-docs or user notices implementation deviates from spec
+    ↓
+Severity check:
+    ├── MINOR (naming, structure differences) → log it, fix in next sprint
+    ├── MODERATE (missing acceptance criteria) → implementing agent fixes in Phase C
+    └── MAJOR (wrong behavior, wrong approach) → see below
+```
+
+**Major spec deviation recovery:**
+1. Implementing agent stops work on the feature
+2. Agent messages design-lead: "Implementation X doesn't match spec because [reason]"
+3. Two possible outcomes:
+   - **Spec was wrong/unclear** → design-lead revises the spec, user approves revision, agent re-implements
+   - **Implementation was wrong** → agent reverts their changes and re-implements from the spec
+4. If the fix can't happen within the current sprint, the feature is **carried over** to the next sprint and flagged in the sprint review
+
+### Agent Writes Outside Owned Directories
+
+```
+Agent accidentally creates/modifies files outside its owned directories
+    ↓
+qa-docs flags the boundary violation in review
+    ↓
+Offending files are moved or deleted
+    ↓
+Correct agent recreates them in the right location
+    ↓
+If a pattern emerges, review whether directory ownership needs updating
+```
+
+**Prevention:** Each agent definition in `.claude/agents/` explicitly lists owned directories and "Never Touches" boundaries. The `feature-implementer` skill also scopes its plan to the agent's directories.
+
+### Autoload API Changes Mid-Sprint
+
+```
+systems-dev needs to change an autoload API that gameplay-dev or ui-dev already depends on
+    ↓
+systems-dev DOES NOT change the API silently
+    ↓
+systems-dev messages affected agents: "Need to change [signal/method] because [reason]"
+    ↓
+Options:
+    ├── Add new API alongside old (non-breaking) → preferred
+    ├── Coordinate simultaneous change → both agents update in same Phase C
+    └── Defer to next sprint → if change is large
+```
+
+**Rule:** Autoload APIs are contracts. Breaking changes require coordination, not silent updates.
+
+### Asset Generation Doesn't Match Vision
+
+```
+asset-artist generates assets that don't match the art direction
+    ↓
+Options:
+    ├── Use mcp__ludo__editImage to adjust existing assets
+    ├── Regenerate with more specific prompts
+    ├── Update the style reference (assets/style_reference.png) with user approval
+    └── User provides reference images or more detailed direction
+```
+
+**Prevention:** Establish the style reference early. All subsequent assets use `generateWithStyle` with that reference.
+
+### Feature Blocked by Missing Dependency
+
+```
+Agent can't start because a dependency isn't ready
+    ↓
+Agent messages the blocking agent directly: "I need [X] to proceed"
+    ↓
+If blocker is in same phase → blocker prioritizes the dependency
+If blocker is in a later phase → feature is deferred to next sprint
+If blocker is the user → user is asked to unblock (approve spec, make decision, etc.)
+```
+
+**Prevention:** The sprint plan should identify dependencies upfront. Use `addBlockedBy` in TaskCreate to make dependencies explicit.
+
+### Sprint Carries Over Incomplete Work
+
+When features aren't finished within a sprint:
+
+1. **In sprint review (Phase D):** Clearly list carried-over features with reason
+2. **User decides:**
+   - Carry to next sprint (add to next sprint's scope)
+   - Deprioritize (move to backlog, may never be built)
+   - Kill (feature isn't worth completing)
+3. **Next sprint plan** accounts for carried-over work in its scope estimate
+
+**Rule:** Never silently drop features. If it was planned and didn't ship, it appears in the sprint review for user decision.
+
+### Debugging Runtime Issues
+
+When features are implemented but have runtime bugs:
+
+```
+Bug discovered (during testing or qa-docs review)
+    ↓
+error-debugger skill diagnoses the issue (any dev agent can use this)
+    ↓
+Fix is scoped to the owning agent's directories
+    ↓
+If bug spans multiple agents' code → agents coordinate via messages
+    ↓
+qa-docs re-reviews the fix
+```
 
 ---
 
