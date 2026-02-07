@@ -1,0 +1,772 @@
+# Agent Team Workflow
+
+A structured approach to AI-assisted game development using coordinated agent teams. This document defines agent roles, tool ownership, sprint structure, quality gates, and user control points.
+
+---
+
+## Development Lifecycle
+
+Development progresses through three phases, each ending with a **user go/no-go gate**. Nothing advances to the next phase without explicit user approval.
+
+```
+┌─────────────────────┐     GO/NO-GO      ┌──────────────────────┐     GO/NO-GO      ┌─────────────────────┐
+│   PROTOTYPE PHASE   │ ──── GATE 1 ────→ │  VERTICAL SLICE PHASE │ ──── GATE 2 ────→ │  PRODUCTION PHASE   │
+│   (Prove the idea)  │                    │  (Prove the quality)  │                    │  (Build the game)   │
+└─────────────────────┘                    └──────────────────────┘                    └─────────────────────┘
+    2-4 sprints                                4-8 sprints                                 8+ sprints
+    Ugly but playable                          Polished slice                              Full content
+```
+
+### Prototype Phase
+**Goal:** Answer the question "Is this fun?" with minimal investment.
+
+| Step | Skill | User Approval Point |
+|------|-------|-------------------|
+| Concept exploration | `game-concept-generator` | User selects concept direction |
+| Feasibility check | `concept-validator` | User reviews risks, decides to proceed |
+| Creative vision | `design-bible-updater` | User approves pillars and tone |
+| Design document | `prototype-gdd-generator` | User approves GDD before any coding |
+| Roadmap | `roadmap-planner` | User approves sprint breakdown |
+| Sprint 1..N | Implementation sprints | User reviews each sprint (see Sprint Review below) |
+
+**Prototype deliverable:** A rough but playable build that tests the core loop.
+
+**Gate 1: Prototype Go/No-Go**
+User plays the prototype and decides:
+- **GO** → Core loop is fun, proceed to vertical slice
+- **PIVOT** → Core loop needs fundamental changes, revise GDD and re-prototype
+- **KILL** → Concept doesn't work, return to concept generation
+
+### Vertical Slice Phase
+**Goal:** Answer the question "Can this be a good game?" by polishing one representative slice.
+
+| Step | Skill | User Approval Point |
+|------|-------|-------------------|
+| Expand GDD | `vertical-slice-gdd-generator` | User approves expanded scope and quality targets |
+| Expanded roadmap | `roadmap-planner` | User approves new sprint breakdown |
+| Sprint 1..N | Implementation sprints with polish focus | User reviews each sprint |
+
+**Vertical slice deliverable:** A polished, representative section of the game — final art, audio, UI, and gameplay quality for one complete experience.
+
+**Gate 2: Vertical Slice Go/No-Go**
+User plays the vertical slice and decides:
+- **GO** → Quality bar is met, proceed to full production
+- **ITERATE** → Slice needs more polish, continue refining
+- **RESCOPE** → Game is good but too ambitious, reduce production scope
+- **KILL** → Quality bar can't be met, stop development
+
+### Production Phase
+**Goal:** Build the full game to the quality bar established by the vertical slice.
+
+| Step | Skill | User Approval Point |
+|------|-------|-------------------|
+| Full GDD | `production-gdd-generator` | User approves full game scope |
+| Production roadmap | `roadmap-planner` | User approves phased rollout |
+| Sprint 1..N | Full implementation sprints | User reviews each sprint |
+| Content complete | All content skills | User approves content lock |
+| Polish pass | VFX, audio, UI refinement | User approves quality bar |
+
+---
+
+## User Control Points
+
+**You (the user) are the creative director.** Agents propose, you approve. Nothing ships without your sign-off. Here is every point where the workflow pauses for your input.
+
+### Lifecycle Gates (highest level)
+
+| Gate | When | What You Decide | Options |
+|------|------|----------------|---------|
+| Concept approval | After `game-concept-generator` | Which concept direction to pursue | Select, modify, or regenerate |
+| Feasibility review | After `concept-validator` | Whether risks are acceptable | Proceed, adjust scope, or abandon |
+| Design bible approval | After `design-bible-updater` | Whether pillars and tone are right | Approve, revise pillars, or restart |
+| GDD approval | After GDD generator | Whether the design is what you want | Approve, request changes, or restart |
+| Roadmap approval | After `roadmap-planner` | Whether the sprint breakdown makes sense | Approve, reorder, add/remove sprints |
+| Prototype go/no-go | After prototype sprints complete | Whether to proceed to vertical slice | Go, pivot, or kill |
+| Vertical slice go/no-go | After VS sprints complete | Whether to proceed to production | Go, iterate, rescope, or kill |
+
+### Sprint Gates (per sprint)
+
+| Gate | When | What You Decide | Options |
+|------|------|----------------|---------|
+| Spec approval | After design-lead writes feature specs | Whether each spec matches your vision | Approve, request changes, or reject |
+| Implementation plan review | After `feature-implementer` generates a plan | Whether the approach is right | Approve or request different approach |
+| Sprint review | After all sprint work + QA complete | Whether the sprint meets your expectations | Accept, request fixes, or reject features |
+| Next sprint approval | After reviewing sprint + seeing next sprint's proposed specs | Whether to proceed as planned | Proceed, modify next sprint scope, or pause |
+
+### Ad-Hoc Control (anytime)
+
+You can intervene at any point during development to:
+- **Redirect creative direction** → design-lead updates the design bible
+- **Modify a feature spec** → design-lead revises before implementation continues
+- **Kill a feature mid-sprint** → agents stop work on that feature
+- **Add an unplanned feature** → design-lead creates an idea brief and spec
+- **Request a playtest build** → agents pause to produce a testable build
+- **Change art direction** → asset-artist establishes a new style reference
+- **Reprioritize the roadmap** → reorder upcoming sprints
+
+### How Control Points Work in Practice
+
+When an agent reaches a control point, they **stop and present you with**:
+1. A summary of what was produced
+2. The key decisions or tradeoffs involved
+3. Specific questions if any ambiguity exists
+4. Clear options: approve, modify, or reject
+
+**You respond with one of:**
+- **Approve** → work continues to the next phase
+- **Modify** → you provide specific feedback, agent revises
+- **Reject** → agent discards and starts over with new direction from you
+- **Discuss** → you want to talk through options before deciding
+
+---
+
+## Team Composition (7 Agents)
+
+### design-lead
+**Purpose:** Owns creative vision, design documentation, and feature specifications. The single source of truth for *why* we build things and *what* we build.
+
+**Owned Directories:**
+- `docs/design-bible.md`
+- `docs/*-gdd.md`
+- `docs/features/`
+- `docs/ideas/`
+- `docs/tools/` (tool specs and roadmaps)
+
+**Skills:**
+| Skill | When Used |
+|-------|-----------|
+| `design-bible-updater` | Establishing/updating design pillars, vision, creative direction |
+| `prototype-gdd-generator` | Creating the initial Game Design Document through interactive Q&A |
+| `vertical-slice-gdd-generator` | Expanding prototype GDD into vertical slice scope |
+| `feature-idea-designer` | Refining vague feature ideas into structured Feature Idea Briefs via Q&A |
+| `feature-spec-generator` | Writing detailed specs from idea briefs before each sprint's implementation |
+| `concept-validator` | Stress-testing feasibility of game concepts and features |
+| `game-concept-generator` | Initial ideation and concept exploration |
+| `tool-spec-generator` | Writing specifications for development tools, editor plugins, utilities |
+| `tool-roadmap-planner` | Breaking tool specs into phased implementation roadmaps |
+
+**Feature Pipeline (design-lead owns the first 3 steps):**
+```
+Vague idea → feature-idea-designer → Idea Brief (docs/ideas/)
+         → feature-spec-generator → Feature Spec (docs/features/)
+         → developers implement using feature-implementer
+```
+
+**Tool Pipeline (design-lead specs, systems-dev implements):**
+```
+Tool need → tool-spec-generator → Tool Spec (docs/tools/)
+        → tool-roadmap-planner → Tool Roadmap (docs/tools/)
+        → systems-dev implements using tool-feature-implementer
+```
+
+**Never Touches:** Code files, scene files, asset files, data files.
+
+---
+
+### systems-dev
+**Purpose:** Builds the foundational layer that all other developers depend on. Autoloads, managers, core services, and shared utilities. Starts first in each sprint to unblock others. Also implements development tools and editor plugins.
+
+**Owned Directories:**
+- `scripts/autoloads/`
+- `scripts/systems/`
+- `scripts/resources/` (custom Resource class definitions)
+- `addons/` (editor plugins and development tools)
+
+**Skills:**
+| Skill | When Used |
+|-------|-----------|
+| `feature-implementer` | Implementing system-level features from specs in `docs/features/` |
+| `tool-feature-implementer` | Implementing development tools from specs in `docs/tools/` |
+
+**Implementation Workflow:**
+1. Read the feature spec or tool roadmap from `docs/`
+2. `feature-implementer` generates an implementation plan and requests confirmation
+3. Creates all necessary scripts, resources, and configurations
+4. Produces an implementation report
+
+**Responsibilities:**
+- Event bus / signal relay systems
+- Game state management
+- Save/load systems
+- Resource loading and caching
+- Input management
+- Scene transition management
+- Audio management (playback systems, not sourcing audio)
+- Any singleton or manager pattern
+- Editor plugins and development tools (via `tool-feature-implementer`)
+
+**Never Touches:** Gameplay entity scripts, UI scripts, scene files (except tool-related), asset files, design docs.
+
+---
+
+### gameplay-dev
+**Purpose:** Implements game mechanics, entities, physics interactions, and gameplay scenes. Works with Node2D/3D, CharacterBody, Area nodes.
+
+**Owned Directories:**
+- `scenes/gameplay/`
+- `scripts/entities/`
+- `scripts/components/`
+- `scenes/levels/`
+
+**Responsibilities:**
+- Player controller and movement
+- Enemy entities and AI
+- Combat mechanics and hitboxes
+- Physics interactions
+- Gameplay scene composition
+- Level/map scene assembly
+- VFX integration (particles attached to gameplay entities)
+
+**Skills:**
+| Skill | When Used |
+|-------|-----------|
+| `feature-implementer` | Implementing gameplay features from specs in `docs/features/` |
+| `scene-optimizer` | After building complex scenes, checking for structural/performance issues |
+| `vfx-generator` | Creating procedural particle effects for gameplay entities |
+
+**Implementation Workflow:**
+1. Read the feature spec from `docs/features/`
+2. `feature-implementer` reads GDD, design bible, and systems bible for context
+3. Generates an implementation plan scoped to gameplay directories only
+4. Creates scenes, entity scripts, and component scripts
+5. Produces an implementation report
+
+**Never Touches:** UI scenes/scripts, autoloads, asset generation, design docs, data files.
+
+---
+
+### ui-dev
+**Purpose:** Builds all user-facing interface elements. Works exclusively with Control nodes and UI scenes.
+
+**Owned Directories:**
+- `scenes/ui/`
+- `scripts/ui/`
+- `resources/themes/`
+
+**Skills:**
+| Skill | When Used |
+|-------|-----------|
+| `feature-implementer` | Implementing UI features from specs in `docs/features/` |
+
+**Implementation Workflow:**
+1. Read the feature spec from `docs/features/`
+2. `feature-implementer` reads GDD, design bible, and systems bible for context
+3. Generates an implementation plan scoped to UI directories only
+4. Creates UI scenes, scripts, and theme resources
+5. Produces an implementation report
+
+**Responsibilities:**
+- HUD (health bars, score, minimap, status indicators)
+- Menus (main menu, pause, settings, inventory)
+- Popups and dialogs
+- Damage numbers and floating text
+- Combat log / message feed
+- Theme resources and UI styling
+- Screen transitions and UI animations
+
+**Never Touches:** Gameplay scenes, entity scripts, autoloads, asset generation, design docs.
+
+---
+
+### content-architect
+**Purpose:** Creates all game content as structured data files. Characters, quests, dialogue, encounters, and world definitions. Owns the campaign-level view that ties content together.
+
+**Owned Directories:**
+- `data/characters/`
+- `data/quests/`
+- `data/dialogue/`
+- `data/encounters/`
+- `data/campaigns/`
+- `data/world/`
+- `data/items/`
+
+**Skills:**
+| Skill | When Used |
+|-------|-----------|
+| `character-creator` | Defining NPCs, companions, enemies as structured data |
+| `world-builder` | Creating worldmap files with locations and connections |
+| `dialogue-designer` | Writing dialogue trees for NPCs |
+| `quest-designer` | Designing quest definitions with objectives and rewards |
+| `encounter-designer` | Creating combat encounter configurations |
+| `campaign-creator` | Tying all content together into playable campaigns |
+
+**Workflow Pattern:** Uses `campaign-creator` iteratively:
+1. MINIMAL mode - create campaign skeleton early
+2. UPDATE mode - add content as other data files are created
+3. FINALIZE mode - validate all cross-references before milestone
+
+**Never Touches:** Code files, scene files, UI, autoloads, design docs.
+
+---
+
+### asset-artist
+**Purpose:** Generates all visual and audio assets using AI tools. Produces files that other agents reference by path.
+
+**Owned Directories:**
+- `assets/sprites/`
+- `assets/tilesets/`
+- `assets/animations/`
+- `assets/ui/`
+- `assets/backgrounds/`
+- `assets/models/`
+- `assets/vfx/`
+- `music/`
+- `sfx/`
+- `voice/`
+
+**MCP Tools:**
+
+| Tool | Purpose | Provider |
+|------|---------|----------|
+| `mcp__ludo__createImage` | Generate sprites, icons, backgrounds, textures, UI assets | Ludo |
+| `mcp__ludo__editImage` | Modify existing images (remove backgrounds, recolor, adjust) | Ludo |
+| `mcp__ludo__generateWithStyle` | Generate new assets matching a reference image's style | Ludo |
+| `mcp__ludo__animateSprite` | Create animated spritesheets from static sprites | Ludo |
+| `mcp__ludo__create3DModel` | Generate 3D models if needed | Ludo |
+| `mcp__ludo__generatePose` | Generate character poses | Ludo |
+| `mcp__ludo__createSpeech` | Generate voice lines for characters | Ludo |
+| `mcp__ludo__createVoice` | Create custom voices for characters | Ludo |
+| `mcp__epidemic-sound__SearchRecordings` | Find music tracks by mood, genre, BPM | Epidemic Sound |
+| `mcp__epidemic-sound__DownloadRecording` | Download selected music tracks | Epidemic Sound |
+| `mcp__epidemic-sound__SearchSoundEffects` | Find sound effects by description | Epidemic Sound |
+| `mcp__epidemic-sound__DownloadSoundEffect` | Download selected sound effects | Epidemic Sound |
+| `mcp__epidemic-sound__EditRecording` | Edit/trim music recordings | Epidemic Sound |
+
+**Style Consistency:** Uses `generateWithStyle` with a reference image to maintain visual coherence across all generated assets. A style reference should be established early and reused.
+
+**Never Touches:** Code files, scene files, data files, design docs.
+
+---
+
+### qa-docs
+**Purpose:** Quality gate and documentation. Reviews completed work, identifies issues, maintains living technical documentation. Always operates one sprint behind the implementation agents.
+
+**Owned Directories:**
+- `docs/code-reviews/`
+- `docs/data-analysis/`
+- `docs/systems-bible.md`
+- `docs/architecture.md`
+- `CHANGELOG.md`
+
+**Skills:**
+| Skill | When Used |
+|-------|-----------|
+| `gdscript-quality-checker` | After each feature is implemented — mandatory quality gate |
+| `data-driven-refactor` | After 3+ features, identify hardcoded values to extract |
+| `data-extractor` | Execute data extraction recommendations (with confirmation) |
+| `systems-bible-updater` | After each sprint — document how systems work |
+| `architecture-documenter` | After each sprint — update scene trees, signal maps, structure |
+| `changelog-updater` | After each sprint — record what was added/changed/fixed |
+| `version-control-helper` | When git workflow questions arise |
+
+**Never Touches:** Writing new features, making design decisions, creating assets.
+
+---
+
+## Directory Ownership Map
+
+```
+project-root/
+├── docs/
+│   ├── design-bible.md              ← design-lead
+│   ├── *-gdd.md                     ← design-lead
+│   ├── features/                    ← design-lead
+│   ├── ideas/                       ← design-lead
+│   ├── tools/                       ← design-lead (specs + roadmaps)
+│   ├── code-reviews/                ← qa-docs
+│   ├── data-analysis/               ← qa-docs
+│   ├── systems-bible.md             ← qa-docs
+│   └── architecture.md              ← qa-docs
+├── addons/                          ← systems-dev (editor plugins, dev tools)
+├── scripts/
+│   ├── autoloads/                   ← systems-dev
+│   ├── systems/                     ← systems-dev
+│   ├── resources/                   ← systems-dev
+│   ├── entities/                    ← gameplay-dev
+│   ├── components/                  ← gameplay-dev
+│   └── ui/                          ← ui-dev
+├── scenes/
+│   ├── gameplay/                    ← gameplay-dev
+│   ├── levels/                      ← gameplay-dev
+│   └── ui/                          ← ui-dev
+├── data/
+│   ├── characters/                  ← content-architect
+│   ├── quests/                      ← content-architect
+│   ├── dialogue/                    ← content-architect
+│   ├── encounters/                  ← content-architect
+│   ├── campaigns/                   ← content-architect
+│   ├── world/                       ← content-architect
+│   └── items/                       ← content-architect
+├── assets/
+│   ├── sprites/                     ← asset-artist
+│   ├── tilesets/                    ← asset-artist
+│   ├── animations/                  ← asset-artist
+│   ├── ui/                          ← asset-artist
+│   ├── backgrounds/                 ← asset-artist
+│   └── vfx/                         ← asset-artist
+├── resources/
+│   └── themes/                      ← ui-dev
+├── music/                           ← asset-artist
+├── sfx/                             ← asset-artist
+├── voice/                           ← asset-artist
+└── CHANGELOG.md                     ← qa-docs
+```
+
+---
+
+## Sprint Structure
+
+Each sprint delivers a **playable vertical slice increment** — a small but complete piece of the game that can be tested.
+
+### Sprint Phases
+
+```
+Phase A: Spec & Foundation (systems-dev + design-lead)
+├── design-lead writes feature specs for this sprint (feature-spec-generator)
+├── USER APPROVES each feature spec before implementation begins
+├── systems-dev reads specs, implements system-level features (feature-implementer)
+├── systems-dev builds/extends autoloads and services needed
+└── asset-artist begins generating assets for this sprint (parallel)
+
+Phase B: Implementation (gameplay-dev + ui-dev + content-architect)
+├── gameplay-dev reads specs, implements gameplay features (feature-implementer)
+├── ui-dev reads specs, implements UI features (feature-implementer)
+├── content-architect creates data files
+└── asset-artist continues generating assets (parallel)
+
+Phase C: QA & Documentation (qa-docs)
+├── qa-docs reviews all code from this sprint (gdscript-quality-checker)
+├── qa-docs updates systems bible, architecture, changelog
+├── developers fix critical issues identified in review
+└── design-lead pipelines: refines ideas and writes specs for NEXT sprint
+
+Phase D: Sprint Review (USER — all agents paused)
+├── USER receives: sprint summary, QA reports, implementation reports, changelog
+├── USER playtests the build in Godot
+├── USER decides for each feature: accept, request changes, or reject
+├── USER reviews proposed specs for next sprint
+├── USER approves, modifies, or reorders next sprint scope
+└── Only after USER approval does the next sprint begin
+```
+
+**Phase D is mandatory.** Agents do not begin the next sprint until the user has reviewed and approved. This is the primary creative control mechanism.
+
+### Feature Implementation Flow (per feature, per agent)
+
+Every developer agent follows the same `feature-implementer` workflow:
+
+```
+1. Read feature spec from docs/features/
+2. Read project context (GDD, design bible, systems bible)
+3. Check for dependency systems (autoloads, signals)
+4. Generate implementation plan → request confirmation
+5. Implement within owned directories ONLY
+6. Produce implementation report
+```
+
+This ensures consistent code structure and documentation across all three dev agents, even though they write to different directories.
+
+### Sprint Timeline (within a single sprint)
+
+```
+                    Phase A      Phase B         Phase C      Phase D
+design-lead:        ████████░░░░░░░░░░░░░░░░░░░░████████░░  (spec → next spec)
+systems-dev:        ████████████░░░░░░░░░░░░░░░░░░░░░░░░░░  (foundation first)
+asset-artist:       ████████████████████████████░░░░░░░░░░░  (continuous)
+gameplay-dev:       ░░░░░░░░░░░░████████████████████░░░░░░░  (after systems)
+ui-dev:             ░░░░░░░░░░░░████████████████████░░░░░░░  (after systems)
+content-architect:  ░░░░░░████████████████████████░░░░░░░░░  (after specs ready)
+qa-docs:            ████████████████████████████████████░░░░  (reviewing prev + current)
+USER:               ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░██████  (approve specs → sprint review)
+                                                        ▲
+                                                   ALL AGENTS PAUSE
+                                                   User reviews + approves
+```
+
+### Sprint Dependencies
+
+```
+design-lead (feature specs)
+    ↓
+systems-dev (autoload APIs)
+    ↓
+┌───────────────────┬──────────────────┐
+gameplay-dev        ui-dev             content-architect
+(mechanics)         (interface)        (data files)
+└───────────────────┴──────────────────┘
+    ↓
+qa-docs (review + documentation)
+```
+
+---
+
+## Quality Gates
+
+### Mandatory Checkpoints
+
+**User approval gates (workflow pauses for user):**
+
+| When | What | Who | Blocks |
+|------|------|-----|--------|
+| Phase 0 | Each design document (bible, GDD, roadmap) | USER | Entire project |
+| Before any coding | Feature spec reviewed and approved | USER | All implementation of that feature |
+| Before implementation begins | `feature-implementer` plan reviewed | USER | That feature's code |
+| End of each sprint (Phase D) | Sprint review: playtest, accept/reject | USER | Next sprint |
+| End of prototype phase | Go/no-go: proceed to vertical slice? | USER | Vertical slice phase |
+| End of vertical slice phase | Go/no-go: proceed to production? | USER | Production phase |
+
+**Agent quality gates (automated, no user pause):**
+
+| When | What | Who | Blocks |
+|------|------|-----|--------|
+| After systems-dev finishes | Autoload APIs are defined and documented | systems-dev | gameplay-dev, ui-dev |
+| After each feature implemented | `gdscript-quality-checker` review | qa-docs | Next sprint |
+| After 3+ features accumulated | `data-driven-refactor` analysis | qa-docs | Nothing (advisory) |
+| End of each sprint | `changelog-updater` run | qa-docs | Nothing (record-keeping) |
+| End of each sprint | `systems-bible-updater` run | qa-docs | Nothing (documentation) |
+| Before milestones | `architecture-documenter` run | qa-docs | Nothing (documentation) |
+| When design questions arise mid-sprint | Check design bible pillars | design-lead | Disputed decision |
+
+### Code Review Standards
+
+qa-docs runs `gdscript-quality-checker` with focus on:
+1. **Critical issues** — must fix before next sprint
+2. **Performance warnings** — fix if in hot path
+3. **Code quality suggestions** — address in refactoring sprints
+4. **Duplication analysis** — extract when pattern repeats 3+ times
+
+---
+
+## Communication Protocols
+
+### Handoff Contracts
+
+Each agent communicates with others through **files, not messages** wherever possible:
+
+| From | To | Contract |
+|------|-----|----------|
+| design-lead | developers | Feature spec in `docs/features/` (input to `feature-implementer`) |
+| design-lead | developers | Idea briefs in `docs/ideas/` (context for understanding intent) |
+| design-lead | systems-dev | Tool specs + roadmaps in `docs/tools/` (input to `tool-feature-implementer`) |
+| design-lead | content-architect | GDD + feature specs define what content is needed |
+| design-lead | asset-artist | Feature specs describe visual requirements |
+| systems-dev | gameplay-dev, ui-dev | Autoload scripts with public API (methods + signals) |
+| developers | qa-docs | Implementation reports from `feature-implementer` inform review focus |
+| qa-docs | developers | Code review reports in `docs/code-reviews/` |
+| content-architect | gameplay-dev | Data files in `data/` that gameplay loads |
+| asset-artist | gameplay-dev, ui-dev | Asset files in `assets/`, `music/`, `sfx/` referenced by path |
+
+### When Direct Messages Are Needed
+
+Use `SendMessage` only for:
+- **Blocking issues** — "I need X autoload to exist before I can continue"
+- **Clarification requests** — "The feature spec doesn't specify behavior for edge case Y"
+- **Completion signals** — "Sprint N systems are ready, gameplay-dev and ui-dev can start"
+- **Design decisions** — "Should this enemy have ranged or melee attacks?"
+
+Avoid broadcasting. Default to direct messages to the specific agent who can help.
+
+---
+
+## Deliverable Slice Roadmap Template
+
+Sprints are organized around **playable increments**, not systems. Each sprint produces something testable.
+
+```
+Sprint 1: "[Player can X]"
+  ├── Feature Specs: [list from design-lead]
+  ├── Systems Needed: [autoloads/managers from systems-dev]
+  ├── Gameplay Work: [scenes/entities from gameplay-dev]
+  ├── UI Work: [screens/HUD elements from ui-dev]
+  ├── Content Needed: [data files from content-architect]
+  ├── Assets Needed: [sprites/audio from asset-artist]
+  ├── Acceptance Criteria: [from feature spec]
+  └── 🔒 USER REVIEW: playtest, approve/reject features, approve next sprint
+
+Sprint 2: "[Player can Y]"
+  ...
+
+[LIFECYCLE GATE after final sprint in phase]
+  └── 🚦 GO/NO-GO: User decides whether to advance to next lifecycle phase
+```
+
+### Example Roadmap (RPG)
+
+**PROTOTYPE PHASE** (prove the core loop is fun)
+
+```
+Sprint 1: "Player can move through a world"
+  ├── Systems: InputManager, GameState, SceneManager
+  ├── Gameplay: PlayerController, Camera, TileMap scene
+  ├── UI: Debug overlay, FPS counter
+  ├── Content: First worldmap, starting location
+  ├── Assets: Player sprite + walk animation, first tileset, ambient music
+  ├── Criteria: Player moves with WASD, camera follows, world renders
+  └── 🔒 USER REVIEW: Does movement feel good? Is the world readable?
+
+Sprint 2: "Player can encounter and fight an enemy"
+  ├── Systems: CombatManager, EventBus (damage signals)
+  ├── Gameplay: EnemyEntity, HitboxComponent, combat scene
+  ├── UI: Health bar, damage numbers, combat log
+  ├── Content: First enemy definition, test encounter
+  ├── Assets: Enemy sprite + attack animation, combat SFX, battle music
+  ├── Criteria: Player enters combat, can attack, enemy dies or player dies
+  └── 🔒 USER REVIEW: Is combat satisfying? Does the core loop work?
+
+🚦 PROTOTYPE GO/NO-GO: Is the core loop fun enough to invest in polish?
+```
+
+**VERTICAL SLICE PHASE** (prove the quality bar)
+
+```
+Sprint 3: "Player can talk to an NPC and receive a quest"
+  ├── Systems: DialogueManager, QuestTracker
+  ├── Gameplay: NPCEntity, interaction zones
+  ├── UI: Dialogue box, quest journal, notification toast
+  ├── Content: First NPC, dialogue tree, starter quest
+  ├── Assets: NPC sprite (polished), UI sounds, dialogue blips
+  ├── Criteria: Player talks to NPC, receives quest, quest appears in journal
+  └── 🔒 USER REVIEW: Does dialogue feel natural? Is quest tracking clear?
+
+Sprint 4: "Player can complete a quest and be rewarded"
+  ├── Systems: InventoryManager, RewardSystem
+  ├── Gameplay: ItemPickup, quest objective triggers
+  ├── UI: Inventory screen, reward popup, quest complete notification
+  ├── Content: Quest completion data, reward items, updated campaign
+  ├── Assets: Item sprites (polished), reward fanfare SFX, chest animation
+  ├── Criteria: Player completes objective, returns to NPC, receives reward
+  └── 🔒 USER REVIEW: Does the full loop (explore → fight → talk → quest → reward) feel complete?
+
+Sprint 5: "Polish pass on the complete slice"
+  ├── Systems: Performance optimization, bug fixes
+  ├── Gameplay: Tuning, game feel, juice
+  ├── UI: Visual polish, transitions, feedback
+  ├── Content: Balance pass on all data
+  ├── Assets: Final art quality, audio mix, VFX polish
+  ├── Criteria: Slice represents target quality for full game
+  └── 🔒 USER REVIEW: Does this represent the game you want to build?
+
+🚦 VERTICAL SLICE GO/NO-GO: Is quality bar met? Proceed to full production?
+```
+
+**PRODUCTION PHASE** (build the full game)
+
+```
+Sprint 6+: Expand from the validated vertical slice...
+  ├── New content, new systems, new areas
+  ├── Each sprint follows the same Phase A-D structure
+  ├── Each sprint ends with USER REVIEW
+  └── Scope informed by what was proven in the vertical slice
+```
+
+---
+
+## Phase 0: Pre-Sprint Setup
+
+Before sprints begin, design-lead runs the design pipeline. **Every step pauses for user approval.**
+
+```
+1. game-concept-generator     → Explore concepts
+   🔒 USER CHOOSES concept direction
+
+2. concept-validator           → Validate feasibility and risks
+   🔒 USER REVIEWS risks, decides to proceed or adjust
+
+3. design-bible-updater        → Establish pillars, vision, tone
+   🔒 USER APPROVES design pillars (these guide ALL future decisions)
+
+4. prototype-gdd-generator     → Create the GDD through Q&A WITH USER
+   🔒 USER APPROVES final GDD
+
+5. roadmap-planner             → Break GDD into deliverable slices
+   🔒 USER APPROVES sprint breakdown, can reorder/add/remove
+
+6. feature-idea-designer       → Refine Sprint 1 features into Idea Briefs
+   🔒 USER REVIEWS each idea brief for alignment with vision
+
+7. feature-spec-generator      → Convert Idea Briefs into full Feature Specs
+   🔒 USER APPROVES specs before any implementation begins
+```
+
+Only after this pipeline completes — with user approval at every step — does Sprint 1 begin.
+
+### Ongoing Feature Pipeline (during sprints)
+
+While developers implement Sprint N, design-lead pipelines Sprint N+1:
+
+```
+Vague idea or GDD reference
+    ↓
+feature-idea-designer           → docs/ideas/[feature]-idea.md
+    ↓                              (interactive Q&A to refine scope, approach, tradeoffs)
+    🔒 USER REVIEWS idea brief
+    ↓
+feature-spec-generator          → docs/features/[feature].md
+    ↓                              (full spec with implementation details, acceptance criteria)
+    🔒 USER APPROVES spec before it enters any sprint
+    ↓
+developers (feature-implementer) → implementation plan presented
+    🔒 USER CONFIRMS implementation plan
+    ↓
+developers (feature-implementer) → implementation in owned directories
+    ↓                               (builds within owned dirs, produces report)
+qa-docs (gdscript-quality-checker) → docs/code-reviews/[feature]_review.md
+    ↓
+    🔒 USER REVIEWS in Sprint Review (Phase D)
+```
+
+### Tool Development Pipeline (as needed)
+
+When development tools or editor plugins are needed:
+
+```
+Tool need identified
+    ↓
+design-lead (tool-spec-generator)         → docs/tools/[tool]-spec.md
+    🔒 USER APPROVES tool spec
+    ↓
+design-lead (tool-roadmap-planner)        → docs/tools/[tool]-roadmap.md
+    🔒 USER APPROVES roadmap phases       (phased: MVP → Workflow → Polish)
+    ↓
+systems-dev (tool-feature-implementer)    → addons/[tool]/
+    ↓                                        (implements one phase at a time)
+qa-docs (gdscript-quality-checker)        → docs/code-reviews/[tool]_review.md
+```
+
+---
+
+## Conventions
+
+### File Naming
+- Scripts: `snake_case.gd` (e.g., `player_controller.gd`)
+- Scenes: `snake_case.tscn` (e.g., `main_menu.tscn`)
+- Resources: `snake_case.tres` (e.g., `default_theme.tres`)
+- Data: `snake_case.json` (e.g., `goblin_warrior.json`)
+- Assets: `snake_case.png` (e.g., `player_idle.png`)
+
+### Commit Messages
+Follow Conventional Commits:
+- `feat:` new feature
+- `fix:` bug fix
+- `refactor:` code restructuring
+- `docs:` documentation only
+- `asset:` new or updated assets
+- `content:` new or updated data files
+
+### Branch Strategy
+- `main` — stable, playable builds only
+- `sprint/N-description` — sprint work branch
+- Feature branches off sprint branch if needed
+
+---
+
+## Modifying This Document
+
+This is a living document. Update it when:
+- A new agent role is needed
+- Directory ownership changes
+- Sprint structure needs adjustment
+- New quality gates are added
+- New MCP tools become available
+
+Keep changes minimal and justified. Document the reason for each change.
