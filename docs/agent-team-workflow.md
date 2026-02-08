@@ -30,18 +30,16 @@ claude
 Ask Claude to create the project, or do it manually:
 
 ```bash
-# Option A: Ask Claude (recommended)
-# "Create a new game called my-game using the Game-Template"
-# Claude runs: gh repo create my-game --template cautiouskurns/Game-Template --clone
-# Then automatically bootstraps and starts the orchestrator
+# Option A: Ask Claude (recommended)                                                                
+# "Create a new game called my-game using the Game-Template"                                        
+# Claude runs: git clone, bootstrap, and orchestrator automatically                                 
+                                                                                                    
+# Option B: Manual                                                                                  
+git clone https://github.com/cautiouskurns/Game-Template.git my-game                                
+cd my-game
 
-# Option B: Via GitHub CLI (manual)
-gh repo create my-new-game --template cautiouskurns/Game-Template --clone
-cd my-new-game
-
-# Option C: Via GitHub web UI (manual)
-# Click "Use this template" on the template repo page, then clone locally
 ```
+No GitHub CLI or authentication required — the template is a public repo.
 
 #### Step 3: Bootstrap (automatic if using Option A)
 
