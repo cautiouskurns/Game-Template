@@ -6,26 +6,44 @@ A structured approach to AI-assisted game development using coordinated agent te
 
 ## Starting a New Project
 
-This workflow is deployed as a **GitHub template repository**. To start a new game project:
+This workflow is deployed as a **GitHub template repository**. The `project-orchestrator` skill enforces the correct sequence automatically — you just need to follow its prompts.
 
-### Step 1: Create from Template
+### Quick Start (2 steps)
 
-```bash
-# Option A: Via GitHub CLI
-gh repo create my-new-game --template YOUR_USERNAME/godot-agent-team-template --clone
-cd my-new-game
-
-# Option B: Via GitHub web UI
-# Click "Use this template" on the template repo page, then clone
+```
+1. Open Claude Code       →  claude
+2. Say                    →  "Create a new game called my-game using the Game-Template"
 ```
 
-### Step 2: Open in Claude Code
+That's it. Claude will clone the template, bootstrap the project, and start the orchestrator — pausing for your approval at every gate. You can also run the steps manually if you prefer (see below).
+
+### Step-by-Step Walkthrough
+
+#### Step 1: Open Claude Code
 
 ```bash
 claude
 ```
 
-### Step 3: Run Bootstrap
+#### Step 2: Create from Template
+
+Ask Claude to create the project, or do it manually:
+
+```bash
+# Option A: Ask Claude (recommended)
+# "Create a new game called my-game using the Game-Template"
+# Claude runs: gh repo create my-game --template cautiouskurns/Game-Template --clone
+# Then automatically bootstraps and starts the orchestrator
+
+# Option B: Via GitHub CLI (manual)
+gh repo create my-new-game --template cautiouskurns/Game-Template --clone
+cd my-new-game
+
+# Option C: Via GitHub web UI (manual)
+# Click "Use this template" on the template repo page, then clone locally
+```
+
+#### Step 3: Bootstrap (automatic if using Option A)
 
 ```
 /project-bootstrap
@@ -36,31 +54,96 @@ The bootstrap skill will:
 2. Verify all template files are present (agents, skills, workflow doc, CLAUDE.md)
 3. Update `project.godot` and `CLAUDE.md` with your project name
 4. Create the full directory structure per the ownership map
-5. Remove template git history and initialize a fresh repo
-6. Create the initial commit
+5. **Initialize the workflow state file** (`docs/.workflow-state.json`)
+6. Remove template git history and initialize a fresh repo
+7. Create the initial commit
 
-### Step 4: Begin Phase 0
+#### Step 4: Start the Orchestrator
 
-After bootstrap completes, start the design pipeline:
-1. Run `game-concept-generator` (or bring your own concept)
-2. Follow the Phase 0 pipeline through to Sprint 1 feature specs
-3. Every step pauses for your approval
+```
+/project-orchestrator
+```
+
+The orchestrator reads the state file and begins **Phase 0: Design Pipeline**. It will guide you through each step in order, pausing for your approval at every gate:
+
+```
+Phase 0 Design Pipeline (orchestrator guides you through each step):
+
+Step 0.1: game-concept-generator  → You select a concept direction
+Step 0.2: concept-validator       → You review feasibility risks
+Step 0.3: design-bible-updater    → You approve design pillars and tone
+Step 0.4: prototype-gdd-generator → You approve the Game Design Document
+Step 0.5: prototype-roadmap-planner → You approve the sprint breakdown
+Step 0.6: feature pipeline        → You approve each Sprint 1 feature spec
+                                     ↓
+                              Sprint 1 begins automatically
+```
+
+**You approve or reject at every step.** Nothing advances without your explicit sign-off.
+
+#### Step 5: Sprint Development (automatic)
+
+Once Phase 0 completes, the orchestrator transitions to sprint mode:
+- Creates a team with the right agents for each sprint phase
+- Manages phase transitions (A → B → C → D)
+- Presents sprint reviews for your approval
+- Tracks everything in the state file
+
+You don't need to remember the workflow rules — the orchestrator enforces them.
+
+### How the Orchestrator Works
+
+The orchestrator is a **state machine** backed by `docs/.workflow-state.json`. This file tracks:
+- Current lifecycle phase (Prototype / Vertical Slice / Production)
+- Current workflow position (which Phase 0 step or which sprint phase)
+- Approval status for every step
+- Sprint progress and feature assignments
+
+**On every session start**, Claude reads `CLAUDE.md` which instructs it to check the state file. If you're mid-workflow, it picks up exactly where you left off.
+
+**Key commands:**
+| Command | What it does |
+|---------|-------------|
+| `/project-orchestrator` | Resume the workflow from current position |
+| "What's my project status?" | Display the status dashboard |
+| "Skip this step" | Skip current step (with warning) |
+| "Go back to [step]" | Backtrack (resets dependent steps) |
+
+### Resuming After a Session Break
+
+When you open a new Claude Code session:
+1. Claude reads `CLAUDE.md` → sees the Orchestrator Protocol
+2. Checks `docs/.workflow-state.json` → finds your current position
+3. Displays the status dashboard
+4. Continues from where you left off
+
+If the state file says you were awaiting approval on the GDD, it will re-present the GDD for your approval. No context is lost.
 
 ### What the Template Contains
 
 ```
 template-repo/
 ├── .claude/
-│   ├── agents/           ← 7 agent role definitions
-│   ├── skills/           ← 46 game development skills
-│   └── settings.local.json ← MCP permissions (Ludo, Epidemic Sound)
+│   ├── agents/              ← 7 agent role definitions
+│   ├── skills/              ← 47 game development skills (including project-orchestrator)
+│   └── settings.local.json  ← MCP permissions (Ludo, Epidemic Sound, Figma, PixelLab)
 ├── docs/
 │   └── agent-team-workflow.md ← This document
-├── CLAUDE.md             ← Project context (customized by bootstrap)
-├── project.godot         ← Godot config (customized by bootstrap)
+├── CLAUDE.md                ← Project context (customized by bootstrap)
+├── project.godot            ← Godot config (customized by bootstrap)
 ├── .gitignore
 ├── .gitattributes
 └── .editorconfig
+```
+
+After bootstrap also creates:
+```
+├── docs/.workflow-state.json ← Workflow position tracker (created by bootstrap)
+├── scripts/                  ← Code directories per ownership map
+├── scenes/                   ← Scene directories per ownership map
+├── data/                     ← Content data directories
+├── assets/                   ← Asset directories
+└── ...                       ← Full directory structure
 ```
 
 ### Updating the Template
@@ -517,18 +600,115 @@ Phase C: QA & Documentation (qa-docs)
 ├── qa-docs reviews all code from this sprint (gdscript-quality-checker)
 ├── qa-docs updates systems bible, architecture, changelog
 ├── developers fix critical issues identified in review
-└── design-lead pipelines: refines ideas and writes specs for NEXT sprint
+├── design-lead pipelines: refines ideas and writes specs for NEXT sprint
+└── SMOKE TEST: headless compile check before handing to user (see below)
 
-Phase D: Sprint Review (USER — all agents paused)
-├── USER receives: sprint summary, QA reports, implementation reports, changelog
-├── USER playtests the build in Godot
-├── USER decides for each feature: accept, request changes, or reject
-├── USER reviews proposed specs for next sprint
-├── USER approves, modifies, or reorders next sprint scope
+Phase D: Sprint Review (USER — iterative review loop)
+├── 1. AUTOMATED: Run `godot --headless --quit` smoke test
+│      └── If compile errors → team lead fixes them BEFORE presenting review
+├── 2. USER receives: sprint summary, QA reports, implementation reports, changelog
+├── 3. USER playtests the build in Godot
+├── 4. REVIEW LOOP (repeats until user satisfied):
+│      ├── USER provides feedback — one of three types:
+│      │     ├── BUG REPORT: something doesn't work as intended → team lead fixes
+│      │     ├── SCOPE ADJUSTMENT: change how a feature works → team lead plans + implements
+│      │     └── SCOPE ADDITION: add new capability to a feature → team lead plans + implements
+│      ├── For scope changes: team lead proposes a mini-plan, USER approves before work begins
+│      ├── Team lead implements the change
+│      ├── Re-run headless smoke test to verify
+│      └── USER tests again
+├── 5. USER decides for each feature: accept, request changes, or reject
+├── 6. USER reviews proposed specs for next sprint
+├── 7. USER approves, modifies, or reorders next sprint scope
 └── Only after USER approval does the next sprint begin
 ```
 
 **Phase D is mandatory.** Agents do not begin the next sprint until the user has reviewed and approved. This is the primary creative control mechanism.
+
+### Headless Smoke Test
+
+Before presenting a sprint for user review, run Godot in headless mode to catch compile/parse errors:
+
+```bash
+godot --headless --quit 2>&1
+```
+
+This catches:
+- Script parse errors (syntax errors, invalid class references)
+- Missing dependencies (autoloads referencing nonexistent scripts)
+- Class name conflicts (e.g., `class_name` hiding an autoload singleton)
+- Resource loading failures
+
+**When to run:**
+1. **Phase C exit gate** — after QA review and critical fixes, before presenting Phase D
+2. **Phase D fix loop** — after each fix, before asking the user to re-test
+
+**If the smoke test fails:** The team lead reads the error output, fixes the issue, and re-runs until it passes. The user should never see compile errors.
+
+### Phase D Review Loop
+
+Phase D is **iterative**, not a single pass. The user plays the build and provides feedback — which may be bug reports, scope adjustments, or scope additions. All three are first-class workflow events handled through the same loop.
+
+```
+┌───────────────────────────────────────────────────────────────────┐
+│  Phase D Review Loop                                              │
+│                                                                   │
+│  1. Run headless smoke test                                       │
+│     └── Fix any compile errors                                    │
+│  2. Present sprint review to user                                 │
+│  3. User playtests the build                                      │
+│  4. User provides feedback (one of three types):                  │
+│     ├── BUG FIX — something broken → team lead fixes directly     │
+│     ├── SCOPE ADJUSTMENT — change behavior → plan → implement     │
+│     └── SCOPE ADDITION — add capability → plan → implement        │
+│  5. For scope changes (adjustments or additions):                 │
+│     ├── Team lead assesses size:                                  │
+│     │   ├── SMALL — minor tweak, implement directly               │
+│     │   ├── MEDIUM — needs a mini-plan, present to user first     │
+│     │   └── LARGE — defer to next sprint (user decides)           │
+│     ├── Team lead proposes approach (plan mode for medium+)       │
+│     ├── USER approves approach before implementation begins       │
+│     └── Team lead implements, runs smoke test                     │
+│  6. User tests again                                              │
+│     └── REPEAT steps 4-6 until satisfied                          │
+│  7. User gives final verdict                                      │
+│     - ACCEPT / REQUEST CHANGES / REJECT                           │
+└───────────────────────────────────────────────────────────────────┘
+```
+
+#### Feedback Types
+
+| Type | What It Means | Example | Process |
+|------|--------------|---------|---------|
+| **Bug fix** | Feature doesn't work as specified | "Clicking the button crashes" | Team lead fixes directly, no plan needed |
+| **Scope adjustment** | User wants to change how a delivered feature works | "Replace the horizontal ticker with vertical cards" | Team lead proposes approach, user approves, then implement |
+| **Scope addition** | User wants new capability added to a feature | "Add click-to-expand detail views with images" | Team lead proposes approach, user approves, then implement |
+
+#### Size Assessment for Scope Changes
+
+Not all scope changes are equal. The team lead should assess the size and communicate it to the user:
+
+| Size | Criteria | Action |
+|------|----------|--------|
+| **Small** | < 2 files changed, no new assets, < 30 min work | Implement directly with brief explanation |
+| **Medium** | 2-6 files, may need new assets or scenes, clear approach | Present a mini-plan for user approval, then implement |
+| **Large** | 7+ files, significant new systems, architectural changes | Recommend deferring to next sprint; user decides |
+
+**User always has final say** on whether to handle a scope change now or defer it. If the user wants something done now that the team lead considers "large," the team lead implements it — but flags the time investment.
+
+#### State File Tracking
+
+The state file tracks each review loop iteration with its type for clean session resumption:
+
+```json
+"fix_loop": [
+  {"type": "bug_fix", "issue": "Button crash on click", "fix": "Null check added", "smoke_test": "pass"},
+  {"type": "scope_adjustment", "issue": "Replace horizontal ticker with vertical cards", "fix": "Created vertical news feed panel", "smoke_test": "pass"},
+  {"type": "scope_addition", "issue": "Add per-template event images", "fix": "Generated 28 Ludo images, dynamic loading", "smoke_test": "pass"}
+]
+```
+
+**Key principle:** All user feedback during Phase D — whether bugs, adjustments, or additions — are **first-class workflow events**, not interruptions. The review loop exists precisely so the user can shape the delivered features before moving on.
 
 ### Sprint Review Format (Phase D)
 
@@ -578,10 +758,22 @@ For each feature:
 - [Any decisions needed, ambiguities, or creative direction questions]
 ```
 
-**How to use this:** The user reads the summary, playtests the build in Godot, then responds with:
+**How to use this:** The user reads the summary, playtests the build in Godot, then responds with one of:
+- **Bug report** (screenshot or text description) → team lead fixes directly
+- **Scope adjustment** ("change X to work like Y instead") → team lead proposes approach, user approves, then implements
+- **Scope addition** ("add Z capability to this feature") → team lead proposes approach, user approves, then implements
 - Per-feature decisions: accept / request changes (with specifics) / reject
 - Next sprint: approve / modify scope / reorder
 - Overall direction: continue / pause / pivot
+
+**Review loop during sprint review:** When the user provides feedback (bugs, scope changes, or visual issues — often via screenshots), the team lead:
+1. Classifies the feedback (bug fix, scope adjustment, or scope addition)
+2. For bug fixes: fixes directly
+3. For scope changes: proposes an approach (plan mode for medium+ changes), gets user approval
+4. Implements the change
+5. Re-runs the headless smoke test (`godot --headless --quit`)
+6. Asks the user to test again
+7. Repeats until the user is satisfied, then re-presents the formal approval gate
 
 ### Feature Implementation Flow (per feature, per agent)
 
@@ -633,6 +825,8 @@ qa-docs (review + documentation)
 ---
 
 ## Team Orchestration
+
+> **Note:** The `project-orchestrator` skill handles all of the below automatically. It reads the workflow state file, spawns the correct agents for each phase, creates tasks, manages transitions, and shuts down teams between sprints. You do not need to manually run these commands — the orchestrator does it for you. This section documents the underlying mechanics for reference.
 
 ### How Agents Are Spawned
 
@@ -731,8 +925,8 @@ The team lead (you or the coordinator agent) manages phase transitions:
 
 1. **A → B:** When systems-dev messages "foundation APIs ready" and user has approved all specs
 2. **B → C:** When all Phase B tasks are marked complete
-3. **C → D:** When qa-docs finishes reviews and developers fix critical issues
-4. **D → next sprint A:** When user approves the sprint review
+3. **C → D:** When qa-docs finishes reviews, developers fix critical issues, AND headless smoke test passes
+4. **D → next sprint A:** When user approves the sprint review (after fix loop completes)
 
 Between sprints, shut down the current team and create a fresh one:
 ```

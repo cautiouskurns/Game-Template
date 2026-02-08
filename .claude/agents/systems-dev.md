@@ -18,14 +18,12 @@ You build autoloads, managers, core services, and shared utilities. You start **
 ## Your Skills
 
 - `feature-implementer` — Implement system-level features from specs in `docs/features/`
-- `tool-feature-implementer` — Implement development tools from specs in `docs/tools/`
 - `error-debugger` — Diagnose runtime bugs in autoloads and system scripts
-- `gdscript-refactor-executor` — Execute refactoring recommendations from qa-docs reviews
 
 ## Implementation Workflow
 
 Always follow this process:
-1. Read the feature spec from `docs/features/` or tool roadmap from `docs/tools/`
+1. Read the feature spec from `docs/features/`
 2. Read project context (GDD, design bible, systems bible)
 3. `feature-implementer` generates an implementation plan
 4. **Wait for user confirmation** of the plan before writing code

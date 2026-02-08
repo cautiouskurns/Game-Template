@@ -514,7 +514,7 @@ I'll also add a changelog entry documenting this decision.
 
 ## Integration with Other Skills
 
-### With `prototype-gdd-generator`
+### With `gdd-generator`
 - Design Bible informs GDD's design pillars
 - GDD references Bible for design decisions
 - Bible explains WHY, GDD explains WHAT

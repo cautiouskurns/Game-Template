@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Workflow State",
+  "description": "Tracks the current position in the agent team development workflow. Written only by the project-orchestrator skill.",
+  "type": "object",
+  "required": ["version", "project_name", "lifecycle_phase", "workflow_position"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "project_name": {
+      "type": "string",
+      "description": "The game project name (set during bootstrap)"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "lifecycle_phase": {
+      "type": "string",
+      "enum": ["not_started", "prototype", "vertical_slice", "production", "killed"],
+      "description": "Current lifecycle phase of the project"
+    },
+    "workflow_position": {
+      "type": "object",
+      "description": "The single source of truth for 'where are we' in the workflow",
+      "required": ["phase", "step", "status"],
+      "properties": {
+        "phase": {
+          "type": "string",
+          "enum": ["pre_phase_0", "phase_0", "sprint"],
+          "description": "Major workflow phase"
+        },
+        "step": {
+          "type": ["string", "null"],
+          "description": "Current skill name (phase_0) or sprint phase letter (sprint)"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "in_progress", "completed", "awaiting_user_approval", "user_requested_changes", "skipped"]
+        },
+        "substep": {
+          "type": ["string", "null"],
+          "description": "Optional substep within a step (e.g., specific feature in pipeline)"
+        }
+      }
+    },
+    "phase_0_progress": {
+      "type": "object",
+      "description": "Tracks each Phase 0 skill's completion status",
+      "properties": {
+        "game_concept_generator": { "$ref": "#/$defs/step_status" },
+        "concept_validator": { "$ref": "#/$defs/step_status" },
+        "design_bible_updater": { "$ref": "#/$defs/step_status" },
+        "prototype_gdd_generator": { "$ref": "#/$defs/step_status" },
+        "prototype_roadmap_planner": { "$ref": "#/$defs/step_status" },
+        "feature_pipeline": {
+          "type": "object",
+          "properties": {
+            "sprint_1_features": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "idea_brief": { "$ref": "#/$defs/step_status" },
+                  "feature_spec": { "$ref": "#/$defs/step_status" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "sprints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["sprint_number", "name", "current_phase"],
+        "properties": {
+          "sprint_number": { "type": "integer", "minimum": 1 },
+          "name": { "type": "string", "description": "Deliverable slice name (e.g., 'Player can move through a world')" },
+          "branch": { "type": "string", "description": "Git branch name" },
+          "lifecycle_phase": { "type": "string", "enum": ["prototype", "vertical_slice", "production"] },
+          "current_phase": { "type": "string", "enum": ["A", "B", "C", "D", "completed"] },
+          "team_name": { "type": ["string", "null"] },
+          "phases": {
+            "type": "object",
+            "properties": {
+              "A": { "$ref": "#/$defs/sprint_phase" },
+              "B": { "$ref": "#/$defs/sprint_phase" },
+              "C": { "$ref": "#/$defs/sprint_phase" },
+              "D": { "$ref": "#/$defs/sprint_phase" }
+            }
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "spec": { "type": "string", "description": "Path to feature spec in docs/features/" },
+                "status": { "type": "string", "enum": ["pending", "implementing", "completed", "carried_over", "rejected"] },
+                "assigned_to": { "type": "string", "description": "Agent name" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "lifecycle_gates": {
+      "type": "object",
+      "properties": {
+        "prototype_gate": { "$ref": "#/$defs/gate_status" },
+        "vertical_slice_gate": { "$ref": "#/$defs/gate_status" }
+      }
+    }
+  },
+  "$defs": {
+    "step_status": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["pending", "in_progress", "completed", "awaiting_user_approval", "user_requested_changes", "skipped"]
+        },
+        "artifact": {
+          "type": ["string", "null"],
+          "description": "Path to output file"
+        },
+        "approved_at": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        }
+      }
+    },
+    "sprint_phase": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["pending", "in_progress", "completed"]
+        },
+        "agents": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "gate_status": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["pending", "completed"]
+        },
+        "decision": {
+          "type": ["string", "null"],
+          "description": "User's gate decision (GO, PIVOT, KILL, ITERATE, RESCOPE)"
+        },
+        "decided_at": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

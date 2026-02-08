@@ -94,7 +94,40 @@ mkdir -p \
   docs/features docs/ideas docs/tools docs/code-reviews docs/data-analysis
 ```
 
-### Step 6: Initialize Git
+### Step 6: Initialize Workflow State
+
+Create the initial workflow state file at `docs/.workflow-state.json`:
+
+```json
+{
+  "version": "1.0.0",
+  "project_name": "[user's project name from Step 1]",
+  "created_at": "[current ISO timestamp]",
+  "updated_at": "[current ISO timestamp]",
+  "lifecycle_phase": "not_started",
+  "workflow_position": {
+    "phase": "pre_phase_0",
+    "step": null,
+    "status": "pending",
+    "substep": null
+  },
+  "phase_0_progress": {
+    "game_concept_generator": { "status": "pending", "artifact": null, "approved_at": null },
+    "concept_validator": { "status": "pending", "artifact": null, "approved_at": null },
+    "design_bible_updater": { "status": "pending", "artifact": null, "approved_at": null },
+    "prototype_gdd_generator": { "status": "pending", "artifact": null, "approved_at": null },
+    "prototype_roadmap_planner": { "status": "pending", "artifact": null, "approved_at": null },
+    "feature_pipeline": { "sprint_1_features": [] }
+  },
+  "sprints": [],
+  "lifecycle_gates": {
+    "prototype_gate": { "status": "pending", "decision": null, "decided_at": null },
+    "vertical_slice_gate": { "status": "pending", "decision": null, "decided_at": null }
+  }
+}
+```
+
+### Step 7: Initialize Git
 
 ```bash
 git init
@@ -110,7 +143,7 @@ Bootstrapped from the Godot agent team template with:
 Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>"
 ```
 
-### Step 7: Remove Template Git History
+### Step 8: Remove Template Git History
 
 Before initializing git, ensure any cloned `.git` directory is removed so the project starts with a clean history:
 
@@ -121,7 +154,7 @@ git init
 
 **IMPORTANT:** Always confirm with the user before removing `.git` — they may have intentionally kept the template history.
 
-### Step 8: Provide Summary
+### Step 9: Provide Summary
 
 Output a clear summary:
 
@@ -135,6 +168,7 @@ Project "[name]" bootstrapped successfully!
 ✓ All 7 agent definitions verified
 ✓ All skills verified
 ✓ Workflow document in place
+✓ Workflow state initialized (docs/.workflow-state.json)
 
 Directory Ownership:
   scripts/autoloads/    → systems-dev
@@ -151,8 +185,8 @@ Directory Ownership:
 
 Next steps:
   1. Open the project in Godot Editor to verify settings
-  2. Begin Phase 0: run /game-concept-generator with design-lead
-  3. Follow the workflow in docs/agent-team-workflow.md
+  2. Run /project-orchestrator to begin the design pipeline
+  3. The orchestrator will guide you through Phase 0 → Sprints → Production
 ```
 
 ## Error Handling

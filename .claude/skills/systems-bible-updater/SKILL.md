@@ -865,11 +865,11 @@ This will save to docs/systems-bible.md
 
 ## Integration with Other Skills
 
-### With `data-driven-refactor`
+### With `data-refactor`
 - After refactoring, update Systems Bible with new data architecture
 - Document resource-based patterns
 
-### With `gdscript-quality-checker`
+### With `code-reviewer`
 - Code quality improvements should update Systems Bible
 - Document new patterns introduced
 
@@ -877,7 +877,7 @@ This will save to docs/systems-bible.md
 - Feature specs reference Systems Bible for implementation details
 - Systems Bible documents HOW feature was implemented
 
-### With `prototype-gdd-generator`
+### With `gdd-generator`
 - GDD describes WHAT systems do
 - Systems Bible describes HOW they work
 

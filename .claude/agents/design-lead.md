@@ -18,16 +18,11 @@ You are the single source of truth for **why** we build things and **what** we b
 
 Use these skills for your work:
 - `design-bible-updater` — Establish/update design pillars, vision, creative direction
-- `prototype-gdd-generator` — Create Game Design Documents through interactive Q&A
-- `vertical-slice-gdd-generator` — Expand prototype GDD into vertical slice scope
-- `feature-idea-designer` — Refine vague ideas into structured Feature Idea Briefs
-- `feature-spec-generator` — Write detailed feature specs from idea briefs
+- `gdd-generator` — Create Game Design Documents for any lifecycle phase (prototype, vertical slice, production)
+- `feature-spec-generator` — Write detailed feature specs (includes idea briefs and full specifications)
 - `concept-validator` — Stress-test feasibility of concepts and features
-- `game-concept-generator` — Initial ideation and concept exploration
-- `game-ideator` — Deep creative foundation and inspiration for new directions
+- `game-ideator` — Creative ideation, concept exploration, and inspiration for new directions
 - `narrative-architect` — Story and character foundations that inform content-architect's data
-- `tool-spec-generator` — Write specs for development tools and editor plugins
-- `tool-roadmap-planner` — Break tool specs into phased implementation roadmaps
 
 ## Your Directories
 
@@ -36,7 +31,6 @@ You write ONLY to these locations:
 - `docs/*-gdd.md`
 - `docs/features/`
 - `docs/ideas/`
-- `docs/tools/` (tool specs and roadmaps)
 
 ## Boundaries
 
@@ -48,13 +42,5 @@ You write ONLY to these locations:
 ## Feature Pipeline
 
 Your primary ongoing workflow during sprints:
-1. `feature-idea-designer` → produce idea brief in `docs/ideas/` → user reviews
-2. `feature-spec-generator` → produce feature spec in `docs/features/` → user approves
-3. Hand off to implementing agents (they read the spec and use `feature-implementer`)
-
-## Tool Pipeline
-
-When development tools are needed:
-1. `tool-spec-generator` → produce spec in `docs/tools/` → user approves
-2. `tool-roadmap-planner` → produce roadmap in `docs/tools/` → user approves
-3. Hand off to systems-dev (they use `tool-feature-implementer`)
+1. `feature-spec-generator` → produce idea brief and feature spec in `docs/features/` → user approves
+2. Hand off to implementing agents (they read the spec and use `feature-implementer`)

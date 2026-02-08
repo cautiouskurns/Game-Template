@@ -354,13 +354,13 @@ Parse commits and categorize:
 
 ## Integration with Other Skills
 
-### With `prototype-gdd-generator`
+### With `gdd-generator`
 - After creating GDD, add to changelog: "Added prototype design document"
 
 ### With `feature-spec-generator`
 - After implementing feature, add to changelog: "Implemented [feature] per spec"
 
-### With `gdscript-refactor-executor`
+### With `code-reviewer`
 - After refactoring, add to changelog: "Refactored [system] for code quality"
 
 ### With Version Control

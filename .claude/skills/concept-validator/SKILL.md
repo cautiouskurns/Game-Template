@@ -568,9 +568,9 @@ The skill needs the user to provide:
 After reading this report, you can:
 
 - **Refine Concept:** Provide adjusted concept for re-validation
-- **Create Prototype Plan:** Use `/vertical-slice-roadmap-planner` for phased roadmap
-- **Generate GDD:** Use `/prototype-gdd-generator` to formalize design
-- **Explore Alternatives:** Use `/game-concept-generator` for alternative ideas
+- **Create Prototype Plan:** Use `/roadmap-planner` for phased roadmap
+- **Generate GDD:** Use `/gdd-generator` to formalize design
+- **Explore Alternatives:** Use `/game-ideator` for alternative ideas
 - **Deep-Dive Analysis:** Request system-specific technical analysis
 
 ---

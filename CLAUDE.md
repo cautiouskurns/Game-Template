@@ -1,8 +1,8 @@
-# Agent Team Test — Project Context
+# {PROJECT_NAME} — Project Context
 
 ## Overview
 
-This is a Godot 4.6 game project developed using an AI agent team workflow. All agents must read and follow the workflow defined in `docs/agent-team-workflow.md`.
+This is a Godot 4 game project developed using an AI agent team workflow. All agents must read and follow the workflow defined in `docs/agent-team-workflow.md`.
 
 ## Workflow
 
@@ -22,6 +22,35 @@ This project uses a structured agent team with 7 roles: design-lead, systems-dev
 4. **Use `feature-implementer` for all implementation.** All three dev agents (systems-dev, gameplay-dev, ui-dev) use the `feature-implementer` skill to implement features from specs.
 5. **Quality reviews are mandatory.** qa-docs runs `gdscript-quality-checker` on all new code. Critical issues block the next sprint.
 
+## Orchestrator Protocol
+
+This project uses the `project-orchestrator` skill to enforce the development workflow.
+
+### On Every Session Start
+
+Before doing any game development work, you MUST:
+
+1. Check if `docs/.workflow-state.json` exists
+2. If it exists: read it, display current position, and follow the orchestrator's instructions for the current step
+3. If it does not exist and the project isn't bootstrapped: suggest `/project-bootstrap`
+4. If bootstrapped but no state file: run `/project-orchestrator` to initialize the workflow
+
+### Rules
+
+- Never skip workflow steps without explicit user approval and a documented reason
+- Never start a sprint without completing the design pipeline for its features
+- Never proceed past a user approval gate without explicit user approval
+- Always update `docs/.workflow-state.json` after each state transition
+- On session restart, read the state file to resume from the correct position
+- The orchestrator is the single authority on workflow sequencing
+
+### Quick Status Check
+
+Users can check project status at any time by saying:
+- `/project-orchestrator` (full orchestrator)
+- "What's my project status?" (read and display state file)
+- "Where am I in the workflow?" (read and display state file)
+
 ## Project Context Files
 
 Before starting work, read the relevant project context:
@@ -35,6 +64,7 @@ Before starting work, read the relevant project context:
 | `docs/systems-bible.md` | Technical documentation of how systems work (when it exists) |
 | `docs/architecture.md` | Project structure, scene trees, signal maps (when it exists) |
 | `CHANGELOG.md` | What has changed and when (when it exists) |
+| `docs/.workflow-state.json` | Current workflow position, sprint state, approval history |
 
 ## GDScript Conventions
 
