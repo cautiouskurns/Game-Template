@@ -153,6 +153,94 @@ When you improve the workflow, agents, or skills during a project:
 
 ---
 
+## Workflow Compliance
+
+**The workflow defined in this document is mandatory.** The team lead must follow it exactly, with no shortcuts or deviations. The following compliance rules apply at all times:
+
+### Compliance Checks
+
+The team lead performs a **workflow compliance check** at every phase transition by:
+1. Reading `docs/.workflow-state.json` to confirm the current position
+2. Verifying all prerequisites for the next phase are met (approvals, completions, smoke tests)
+3. Updating the state file with the new phase before proceeding
+4. Presenting the transition to the user in chat (not silently)
+
+**If the team lead catches itself deviating from the workflow** (e.g., skipping a user approval gate, not spawning agents, not committing), it must stop, acknowledge the deviation, correct course, and resume from the correct workflow position.
+
+### In-Chat Sprint Briefings
+
+At key workflow moments, the team lead must **present a clear summary in chat** — not just update markdown files silently. The user should always know where they are and what's happening.
+
+**Required in-chat presentations:**
+
+| When | What to Present |
+|------|----------------|
+| **Before Phase A starts** | Full sprint briefing: sprint number, deliverable description, features planned, which agents will be spawned, estimated task count |
+| **Phase A → B transition** | What Phase A delivered (systems, resources created), what Phase B agents will do |
+| **Phase B → C transition** | What Phase B delivered (gameplay, UI, content), what QA will review |
+| **Phase C → D transition** | QA results summary, critical issues found/fixed, smoke test result — then formal sprint review |
+| **Phase D completion** | Sprint accepted, what was committed, what's next |
+
+### Version Control During Sprints
+
+**Commits happen at every gate**, not just at the end of a sprint. This ensures progress is saved incrementally and the user can track changes.
+
+| Gate | Commit Trigger | Commit Message Format |
+|------|---------------|----------------------|
+| Phase A complete | All foundation systems delivered | `feat(sprint-N): Phase A — [summary of systems]` |
+| Phase B complete | All gameplay/UI/content delivered | `feat(sprint-N): Phase B — [summary of features]` |
+| Phase C complete | QA fixes applied, smoke test passes | `fix(sprint-N): Phase C — QA fixes` |
+| Phase D accepted | User approves sprint review | `feat(sprint-N): complete — [sprint deliverable]` |
+
+**Rules:**
+- The team lead asks the user before each commit (never auto-commits silently)
+- Each commit includes only the files changed in that phase
+- The sprint branch (`sprint/N-description`) is used for all sprint work
+- After Phase D approval, the team lead asks the user whether to merge to `main`
+
+### Mandatory Agent Teams
+
+**Every sprint MUST use the agent team system.** The team lead must:
+1. Create a team via `TeamCreate` at the start of each sprint
+2. Create tasks via `TaskCreate` for all planned work, with proper dependencies
+3. Spawn agents via `Task` tool with `team_name` parameter for each phase
+4. Track progress via `TaskList` and `TaskUpdate`
+5. Shut down agents between phases (Phase A agents shut down before Phase B agents spawn)
+6. Delete the team via `TeamDelete` after Phase D completes
+
+**No shortcuts.** The team lead must never:
+- Implement sprint work directly without spawning agents
+- Skip task creation and just give agents free-form instructions
+- Leave agents running across phase boundaries
+- Forget to shut down agents after their phase completes
+
+### Ad-Hoc Feature Ideas
+
+When the user has a new feature idea during development, the workflow accommodates it **without breaking the current flow**:
+
+```
+User has a new idea
+    ↓
+Team lead classifies the idea:
+    ├── TRIVIAL (< 1 file, cosmetic) → implement immediately as a Phase D fix
+    ├── SMALL (1-3 files, contained) → add to current sprint's Phase D fix loop
+    ├── MEDIUM (feature-sized) → write an Idea Brief, queue for next sprint
+    └── LARGE (multi-sprint) → write an Idea Brief, add to roadmap backlog
+    ↓
+For MEDIUM and LARGE:
+    1. Team lead acknowledges the idea and classifies it
+    2. Creates a brief note in docs/ideas/ (or adds to existing backlog)
+    3. Presents the classification to the user: "This is a [size] feature. I recommend [queue for next sprint / add to roadmap]. Want to proceed with that, or handle it differently?"
+    4. User decides: queue it, do it now (accepting scope risk), or discard
+    5. If queued: it enters the normal feature pipeline (idea brief → spec → implementation) in the appropriate sprint
+    ↓
+The current sprint continues uninterrupted unless the user explicitly says otherwise.
+```
+
+**Key principle:** New ideas are captured immediately but implemented through the normal pipeline. The user always decides whether to interrupt the current sprint or queue for later.
+
+---
+
 ## Development Lifecycle
 
 Development progresses through three phases, each ending with a **user go/no-go gate**. Nothing advances to the next phase without explicit user approval.
@@ -244,14 +332,18 @@ User plays the vertical slice and decides:
 
 ### Ad-Hoc Control (anytime)
 
-You can intervene at any point during development to:
+You can intervene at any point during development. The team lead classifies your request and handles it **without breaking the current workflow phase** (see "Ad-Hoc Feature Ideas" in the Workflow Compliance section for the detailed process).
+
+Available interventions:
+- **New feature idea** → team lead classifies size, queues appropriately (see Ad-Hoc Feature Ideas)
 - **Redirect creative direction** → design-lead updates the design bible
 - **Modify a feature spec** → design-lead revises before implementation continues
 - **Kill a feature mid-sprint** → agents stop work on that feature
-- **Add an unplanned feature** → design-lead creates an idea brief and spec
 - **Request a playtest build** → agents pause to produce a testable build
 - **Change art direction** → asset-artist establishes a new style reference
 - **Reprioritize the roadmap** → reorder upcoming sprints
+
+**Rule:** The team lead must always acknowledge the intervention, classify it, and propose how to handle it before acting. The user confirms the approach.
 
 ### How Control Points Work in Practice
 
@@ -582,28 +674,41 @@ Each sprint delivers a **playable vertical slice increment** — a small but com
 
 ```
 Phase A: Spec & Foundation (systems-dev + design-lead)
+├── TEAM LEAD presents sprint briefing in chat (features, agents, task count)
+├── TEAM LEAD creates team via TeamCreate, creates tasks via TaskCreate
 ├── design-lead writes feature specs for this sprint (feature-spec-generator)
 ├── USER APPROVES each feature spec before implementation begins
+├── TEAM LEAD spawns systems-dev agent(s) with team_name
 ├── systems-dev reads specs, implements system-level features (feature-implementer)
 ├── systems-dev builds/extends autoloads and services needed
-└── asset-artist begins generating assets for this sprint (parallel)
+├── asset-artist begins generating assets for this sprint (parallel)
+├── TEAM LEAD shuts down Phase A agents when complete
+├── TEAM LEAD presents Phase A results in chat
+└── GIT COMMIT: team lead asks user to approve commit of Phase A work
 
 Phase B: Implementation (gameplay-dev + ui-dev + content-architect)
+├── TEAM LEAD presents Phase B plan in chat (what agents will do)
+├── TEAM LEAD spawns Phase B agents with team_name
 ├── gameplay-dev reads specs, implements gameplay features (feature-implementer)
 ├── ui-dev reads specs, implements UI features (feature-implementer)
 ├── content-architect creates data files
-└── asset-artist continues generating assets (parallel)
+├── asset-artist continues generating assets (parallel)
+├── TEAM LEAD shuts down Phase B agents when complete
+├── TEAM LEAD presents Phase B results in chat
+└── GIT COMMIT: team lead asks user to approve commit of Phase B work
 
 Phase C: QA & Documentation (qa-docs)
+├── SMOKE TEST: headless compile check (godot --headless --quit)
 ├── qa-docs reviews all code from this sprint (gdscript-quality-checker)
 ├── qa-docs updates systems bible, architecture, changelog
-├── developers fix critical issues identified in review
+├── TEAM LEAD fixes critical issues identified in review
+├── SMOKE TEST: re-run after fixes
 ├── design-lead pipelines: refines ideas and writes specs for NEXT sprint
-└── SMOKE TEST: headless compile check before handing to user (see below)
+├── TEAM LEAD presents QA results in chat
+└── GIT COMMIT: team lead asks user to approve commit of QA fixes
 
 Phase D: Sprint Review (USER — iterative review loop)
-├── 1. AUTOMATED: Run `godot --headless --quit` smoke test
-│      └── If compile errors → team lead fixes them BEFORE presenting review
+├── 1. TEAM LEAD presents formal sprint review in chat (see Sprint Review Format)
 ├── 2. USER receives: sprint summary, QA reports, implementation reports, changelog
 ├── 3. USER playtests the build in Godot
 ├── 4. REVIEW LOOP (repeats until user satisfied):
@@ -618,6 +723,8 @@ Phase D: Sprint Review (USER — iterative review loop)
 ├── 5. USER decides for each feature: accept, request changes, or reject
 ├── 6. USER reviews proposed specs for next sprint
 ├── 7. USER approves, modifies, or reorders next sprint scope
+├── 8. GIT COMMIT: team lead commits final sprint state, asks about merge to main
+├── 9. TEAM LEAD deletes team via TeamDelete
 └── Only after USER approval does the next sprint begin
 ```
 
@@ -824,7 +931,7 @@ qa-docs (review + documentation)
 
 ## Team Orchestration
 
-> **Note:** The `project-orchestrator` skill handles all of the below automatically. It reads the workflow state file, spawns the correct agents for each phase, creates tasks, manages transitions, and shuts down teams between sprints. You do not need to manually run these commands — the orchestrator does it for you. This section documents the underlying mechanics for reference.
+> **MANDATORY:** The team lead MUST use the agent team system for every sprint. This is not optional. Every sprint requires `TeamCreate`, `TaskCreate`, `Task` (agent spawning), `TaskUpdate`, and `TeamDelete`. The team lead must never implement sprint work directly — it must always be delegated to spawned agents working within the team structure.
 
 ### How Agents Are Spawned
 
@@ -919,19 +1026,40 @@ Tasks should include:
 
 ### Phase Transitions
 
-The team lead (you or the coordinator agent) manages phase transitions:
+The team lead manages phase transitions. **Every transition requires three actions:**
+1. **Present** results of the completed phase in chat
+2. **Commit** the phase's work (with user approval)
+3. **Update** `docs/.workflow-state.json` with the new phase
 
-1. **A → B:** When systems-dev messages "foundation APIs ready" and user has approved all specs
-2. **B → C:** When all Phase B tasks are marked complete
-3. **C → D:** When qa-docs finishes reviews, developers fix critical issues, AND headless smoke test passes
-4. **D → next sprint A:** When user approves the sprint review (after fix loop completes)
+Transition checklist:
 
-Between sprints, shut down the current team and create a fresh one:
-```
-SendMessage: type="shutdown_request" to each agent
-TeamDelete
-TeamCreate: team_name="sprint-2", description="Sprint 2: ..."
-```
+1. **A → B:**
+   - All Phase A tasks marked complete
+   - Phase A agents shut down via `SendMessage` shutdown_request
+   - Team lead presents Phase A summary in chat
+   - Team lead asks user to approve git commit of Phase A work
+   - Phase B agents spawned with `team_name`
+
+2. **B → C:**
+   - All Phase B tasks marked complete
+   - Phase B agents shut down
+   - Team lead presents Phase B summary in chat
+   - Team lead asks user to approve git commit of Phase B work
+   - Headless smoke test passes before QA begins
+
+3. **C → D:**
+   - QA review complete, critical issues fixed
+   - Headless smoke test passes after fixes
+   - Team lead presents QA summary in chat
+   - Team lead asks user to approve git commit of QA fixes
+   - Formal sprint review presented to user
+
+4. **D → next sprint A:**
+   - User approves sprint review (after fix loop completes)
+   - Final git commit with user approval
+   - Team deleted via `TeamDelete`
+   - New team created for next sprint
+   - Workflow state file updated
 
 ---
 
