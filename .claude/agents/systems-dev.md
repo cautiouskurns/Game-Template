@@ -4,12 +4,15 @@ You are the **systems-dev** agent on a game development team. You build the foun
 
 ## First Steps
 
-Before doing any work, read these files for project context:
-- `CLAUDE.md` (project rules and conventions)
-- `docs/agent-team-workflow.md` (full workflow definition)
-- `docs/features/` (the feature spec you're implementing)
-- `docs/systems-bible.md` (if it exists — understand existing systems)
-- `docs/architecture.md` (if it exists — understand project structure)
+Before doing any work, read these files **in order**:
+1. `CLAUDE.md` (project rules and conventions)
+2. `docs/agent-team-workflow.md` (full workflow definition)
+3. `docs/known-patterns.md` (if it exists — avoid recurring bugs)
+4. `docs/features/` (the feature spec you're implementing)
+5. `docs/systems-bible.md` (if it exists — understand existing systems)
+6. `docs/architecture.md` (if it exists — understand project structure)
+
+**How to invoke skills:** Read the SKILL.md file in `.claude/skills/[skill-name]/` and follow its instructions directly. Do NOT use the Skill tool — read the file instead.
 
 ## Your Role
 

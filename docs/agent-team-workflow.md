@@ -177,7 +177,8 @@ At key workflow moments, the team lead must **present a clear summary in chat** 
 |------|----------------|
 | **Before Phase A starts** | Full sprint briefing: sprint number, deliverable description, features planned, which agents will be spawned, estimated task count |
 | **Phase A → B transition** | What Phase A delivered (systems, resources created), what Phase B agents will do |
-| **Phase B → C transition** | What Phase B delivered (gameplay, UI, content), what QA will review |
+| **Phase B → B.5 transition** | What Phase B delivered, integration points to verify |
+| **Phase B.5 → C transition** | Integration wiring results, smoke test status, what QA will review |
 | **Phase C → D transition** | QA results summary, critical issues found/fixed, smoke test result — then formal sprint review |
 | **Phase D completion** | Sprint accepted, what was committed, what's next |
 
@@ -189,6 +190,7 @@ At key workflow moments, the team lead must **present a clear summary in chat** 
 |------|---------------|----------------------|
 | Phase A complete | All foundation systems delivered | `feat(sprint-N): Phase A — [summary of systems]` |
 | Phase B complete | All gameplay/UI/content delivered | `feat(sprint-N): Phase B — [summary of features]` |
+| Phase B.5 complete | Integration wiring fixes (if any) | `fix(sprint-N): Phase B.5 — integration wiring` |
 | Phase C complete | QA fixes applied, smoke test passes | `fix(sprint-N): Phase C — QA fixes` |
 | Phase D accepted | User approves sprint review | `feat(sprint-N): complete — [sprint deliverable]` |
 
@@ -197,6 +199,19 @@ At key workflow moments, the team lead must **present a clear summary in chat** 
 - Each commit includes only the files changed in that phase
 - The sprint branch (`sprint/N-description`) is used for all sprint work
 - After Phase D approval, the team lead asks the user whether to merge to `main`
+- After each commit, record the commit hash in the workflow state file under `committed_at`:
+
+```json
+"committed_at": {
+  "phase_a": "abc1234",
+  "phase_b": "def5678",
+  "phase_b5": "ghi9012",
+  "phase_c": "jkl3456",
+  "phase_d": "mno7890"
+}
+```
+
+This enables rollback to any phase boundary and helps QA trace which phase introduced issues.
 
 ### Mandatory Agent Teams
 
@@ -519,7 +534,7 @@ Tool need → tool-spec-generator → Tool Spec (docs/tools/)
 ---
 
 ### content-architect
-**Purpose:** Creates all game content as structured data files. Characters, quests, dialogue, encounters, and world definitions. Owns the campaign-level view that ties content together.
+**Purpose:** Creates all game content as structured data files. Characters, quests, dialogue, encounters, and world definitions. Owns the campaign-level view that ties content together. Also creates Godot Resource files (`.tres`) for game data when the project uses Godot's resource system instead of JSON.
 
 **Owned Directories:**
 - `data/characters/`
@@ -529,6 +544,14 @@ Tool need → tool-spec-generator → Tool Spec (docs/tools/)
 - `data/campaigns/`
 - `data/world/`
 - `data/items/`
+- `resources/cards/` (if the game uses card data resources)
+- `resources/enemies/` (if the game uses enemy data resources)
+- `resources/relics/` (if the game uses relic data resources)
+- `resources/potions/` (if the game uses potion data resources)
+- `resources/events/` (if the game uses event data resources)
+- `resources/characters/` (if the game uses character data resources)
+
+**Note:** The `resources/` subdirectories above are for **data-driven content** (`.tres` files that define game content like cards, enemies, items). The Resource **class definitions** (`.gd` scripts in `scripts/resources/`) remain owned by systems-dev. content-architect creates the `.tres` instances; systems-dev creates the `.gd` schemas.
 
 **Skills:**
 | Skill | When Used |
@@ -657,7 +680,13 @@ project-root/
 │   ├── backgrounds/                 ← asset-artist
 │   └── vfx/                         ← asset-artist
 ├── resources/
-│   └── themes/                      ← ui-dev
+│   ├── themes/                      ← ui-dev
+│   ├── cards/                       ← content-architect (.tres data instances)
+│   ├── enemies/                     ← content-architect (.tres data instances)
+│   ├── relics/                      ← content-architect (.tres data instances)
+│   ├── potions/                     ← content-architect (.tres data instances)
+│   ├── events/                      ← content-architect (.tres data instances)
+│   └── characters/                  ← content-architect (.tres data instances)
 ├── music/                           ← asset-artist
 ├── sfx/                             ← asset-artist
 ├── voice/                           ← asset-artist
@@ -696,6 +725,18 @@ Phase B: Implementation (gameplay-dev + ui-dev + content-architect)
 ├── TEAM LEAD shuts down Phase B agents when complete
 ├── TEAM LEAD presents Phase B results in chat
 └── GIT COMMIT: team lead asks user to approve commit of Phase B work
+
+Phase B.5: Integration Wiring (team lead)
+├── TEAM LEAD verifies cross-agent integration points:
+│     ├── Signal connections between autoloads and UI/gameplay scripts
+│     ├── Scene node paths match expected hierarchy (especially nested scenes)
+│     ├── Preloaded resources don't create circular dependencies
+│     ├── Autoload references use correct access patterns (not class_name conflicts)
+│     └── Data files (.tres/.json) are loadable by the scripts that reference them
+├── TEAM LEAD fixes any integration wiring issues directly
+├── SMOKE TEST: headless compile check (godot --headless --quit)
+├── If smoke test fails → fix and re-run until clean
+└── GIT COMMIT (if fixes were needed): team lead asks user to approve
 
 Phase C: QA & Documentation (qa-docs)
 ├── SMOKE TEST: headless compile check (godot --headless --quit)
@@ -803,15 +844,25 @@ Not all scope changes are equal. The team lead should assess the size and commun
 
 #### State File Tracking
 
-The state file tracks each review loop iteration with its type for clean session resumption:
+The state file tracks each review loop iteration with mandatory fields for clean session resumption and post-sprint analysis:
 
 ```json
 "fix_loop": [
-  {"type": "bug_fix", "issue": "Button crash on click", "fix": "Null check added", "smoke_test": "pass"},
-  {"type": "scope_adjustment", "issue": "Replace horizontal ticker with vertical cards", "fix": "Created vertical news feed panel", "smoke_test": "pass"},
-  {"type": "scope_addition", "issue": "Add per-template event images", "fix": "Generated 28 Ludo images, dynamic loading", "smoke_test": "pass"}
+  {"type": "bug_fix", "severity": "critical", "issue": "Button crash on click", "fix": "Null check added", "files_changed": ["scripts/ui/button.gd"], "smoke_test": "pass"},
+  {"type": "scope_adjustment", "severity": "medium", "issue": "Replace horizontal ticker with vertical cards", "fix": "Created vertical news feed panel", "files_changed": ["scripts/ui/news_feed.gd", "scenes/ui/news_panel.tscn"], "smoke_test": "pass"},
+  {"type": "scope_addition", "severity": "medium", "issue": "Add per-template event images", "fix": "Generated 28 Ludo images, dynamic loading", "files_changed": ["scripts/ui/event_screen.gd"], "smoke_test": "pass"}
 ]
 ```
+
+**Required fields per fix_loop entry:**
+| Field | Values | Purpose |
+|-------|--------|---------|
+| `type` | `bug_fix`, `scope_adjustment`, `scope_addition` | Classify the feedback |
+| `severity` | `critical`, `high`, `medium`, `low` | Prioritize and track patterns |
+| `issue` | Free text | What the user reported |
+| `fix` | Free text | What was done |
+| `files_changed` | Array of paths | Track blast radius |
+| `smoke_test` | `pass`, `fail`, `skipped` | Verify stability |
 
 **Key principle:** All user feedback during Phase D — whether bugs, adjustments, or additions — are **first-class workflow events**, not interruptions. The review loop exists precisely so the user can shape the delivered features before moving on.
 
@@ -999,12 +1050,30 @@ Task: name="content-architect", subagent_type="general-purpose", team_name="spri
 Task: name="qa-docs", subagent_type="general-purpose", team_name="sprint-1"
 ```
 
-Each agent's prompt should reference its agent definition file:
+Each agent's prompt MUST follow this standard template. Consistency across agents prevents drift and ensures every agent reads the correct context before acting:
+
 ```
-"You are the systems-dev agent. Read .claude/agents/systems-dev.md for your full role definition,
-then read CLAUDE.md and docs/agent-team-workflow.md for project context.
-Your task for this sprint is: [specific task from sprint plan]"
+"You are the [ROLE] agent. Follow these steps in order:
+
+1. Read your role definition: .claude/agents/[ROLE].md
+2. Read project rules: CLAUDE.md
+3. Read the workflow: docs/agent-team-workflow.md
+4. Read the feature spec: docs/features/[FEATURE].md
+5. Read known patterns: docs/known-patterns.md (if it exists — avoid recurring bugs)
+6. Read the systems bible: docs/systems-bible.md (if it exists — understand existing systems)
+
+Your task for this sprint: [specific task from sprint plan]
+
+Skills are invoked by reading the SKILL.md file in .claude/skills/[skill-name]/ and following
+its instructions directly. Do NOT use the Skill tool to invoke skills — read the file instead.
+"
 ```
+
+**Required fields in every agent prompt:**
+- Role name matching the `.claude/agents/` filename
+- Specific feature spec path(s) for this sprint
+- Explicit task description
+- Reference to `docs/known-patterns.md` for recurring bug avoidance
 
 ### Task Assignment Pattern
 
@@ -1040,26 +1109,32 @@ Transition checklist:
    - Team lead asks user to approve git commit of Phase A work
    - Phase B agents spawned with `team_name`
 
-2. **B → C:**
+2. **B → B.5:**
    - All Phase B tasks marked complete
    - Phase B agents shut down
    - Team lead presents Phase B summary in chat
    - Team lead asks user to approve git commit of Phase B work
-   - Headless smoke test passes before QA begins
 
-3. **C → D:**
+3. **B.5 → C:**
+   - Team lead completes integration wiring verification (see Phase B.5 checklist)
+   - Headless smoke test passes
+   - Integration fixes committed (if any)
+   - QA can now begin on a stable, integrated codebase
+
+4. **C → D:**
    - QA review complete, critical issues fixed
    - Headless smoke test passes after fixes
    - Team lead presents QA summary in chat
    - Team lead asks user to approve git commit of QA fixes
    - Formal sprint review presented to user
 
-4. **D → next sprint A:**
+5. **D → next sprint A:**
    - User approves sprint review (after fix loop completes)
    - Final git commit with user approval
+   - **Stale task cleanup:** Review TaskList — mark any lingering `in_progress` tasks as `completed` or `deleted`. No tasks from the previous sprint should carry into the new team.
    - Team deleted via `TeamDelete`
    - New team created for next sprint
-   - Workflow state file updated
+   - Workflow state file updated (including `committed_at` timestamps for each phase)
 
 ---
 
@@ -1252,6 +1327,7 @@ Each agent communicates with others through **files, not messages** wherever pos
 | systems-dev | gameplay-dev, ui-dev | Autoload scripts with public API (methods + signals) |
 | developers | qa-docs | Implementation reports from `feature-implementer` inform review focus |
 | qa-docs | developers | Code review reports in `docs/code-reviews/` |
+| qa-docs | all agents | Known bug patterns in `docs/known-patterns.md` (updated when recurring issues found) |
 | content-architect | gameplay-dev | Data files in `data/` that gameplay loads |
 | asset-artist | gameplay-dev, ui-dev | Asset files in `assets/`, `music/`, `sfx/` referenced by path |
 
