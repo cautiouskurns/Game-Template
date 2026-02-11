@@ -12,7 +12,7 @@ This workflow is deployed as a **GitHub template repository**. The `project-orch
 
 ```
 1. Open Claude Code       →  claude
-2. Say                    →  "Create a new game called my-game using the Game-Template"
+2. Say                    →  " Clone the Game-Template from https://github.com/cautiouskurns/Game-Template.git into this project directory, then run /project-bootstrap to set everything up. "
 ```
 
 That's it. Claude will clone the template, bootstrap the project, and start the orchestrator — pausing for your approval at every gate. You can also run the steps manually if you prefer (see below).
