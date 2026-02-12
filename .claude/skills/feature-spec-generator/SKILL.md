@@ -442,6 +442,29 @@ These need resolution during implementation:
 - Listens for: [Signal list]
 - Modifies: [Affected game state]
 
+### Scene Instantiation Map
+Where each new scene gets added to the game:
+- **[scene_name.tscn]** → instantiated by: [parent scene or script that loads/instances it]
+- **[ui_scene.tscn]** → added to: [existing scene, e.g., hud.tscn] at node path [path]
+- **[level_scene.tscn]** → loaded by: [e.g., RoomManager.transition_to_room()]
+
+> **Why this matters:** Every scene created must be referenced somewhere. Orphaned scenes (created but never instantiated) are a recurring integration bug. If a scene is dynamically loaded, specify which script calls `load()` or `preload()`. If it's a child of an existing scene, specify which `.tscn` file gets the new `instance=ExtResource()` entry.
+
+### Spatial Dimensions
+If this feature creates rooms, levels, UI panels, or any spatial content:
+- Reference player sprite size: [e.g., 256x256]
+- Reference viewport size: [e.g., 1920x1080]
+- Room/area dimensions: [width x height, justified relative to player size]
+- Key entity positions: [where spawns, triggers, etc. go relative to room bounds]
+
+> **Why this matters:** Check `docs/known-patterns.md` Reference Dimensions section for the project's established scale. All spatial content must be proportional to the player sprite and viewport.
+
+### Asset Fallbacks
+For each visual/audio asset this feature needs:
+- **[Asset name]**: Primary source: [Ludo MCP / Epidemic Sound / hand-drawn]. Fallback: [ColorRect with color X and size Y / procedural VFX / placeholder SFX]
+
+> **Why this matters:** Asset generation tools may be unavailable. Every asset must have a concrete fallback so the feature is playable without real art.
+
 ### Configuration
 - JSON data: [File location]
 - Tunable constants: [Where defined]
@@ -529,6 +552,9 @@ Feature is complete when:
 4. **Realistic scope** for the project timeline
 5. **Testable acceptance criteria** (5+ items)
 6. **Clear integration points** with existing systems
+7. **Scene Instantiation Map** — every new `.tscn` must specify where it gets instantiated
+8. **Spatial Dimensions** (if applicable) — room/level sizes justified relative to Reference Dimensions in `docs/known-patterns.md`
+9. **Asset Fallbacks** — every visual/audio asset must have a concrete placeholder fallback
 
 ### Red Flags to Avoid
 

@@ -58,6 +58,71 @@ A living reference of Godot gotchas and integration patterns discovered during d
 **Problem:** When agents work across phases or sessions, files created in Phase A may not be visible or may have been overwritten by Phase B agents who weren't aware of them.
 **Fix:** Always verify that expected files exist before referencing them. Use `ResourceLoader.exists()` or file checks before `preload()`/`load()`.
 
+### 12. Orphaned scenes never instantiated
+**Problem:** An agent creates a `.tscn` file (e.g., `boss_health_bar.tscn`) but never adds it as a child of any other scene or loads it from any script. The scene exists on disk but is never visible in-game.
+**Fix:** Every new `.tscn` must be referenced by at least one other `.tscn` (via `instance=ExtResource()`) or loaded by a script (via `load()`/`preload()`). Feature specs must include a Scene Instantiation Map. Phase B.5 verifies no orphaned scenes.
+
+### 13. Persistent entities destroyed during room transitions
+**Problem:** If the Player or HUD is instanced as a child of a room scene, it gets `queue_free()`'d when the room transitions. The player disappears.
+**Fix:** Persistent entities (Player, HUD) must live outside the room tree — as siblings of the RoomContainer, not children of any room. Use a Game wrapper scene pattern: `Game > RoomContainer + Player + HUD`.
+
+### 14. Stale class cache after adding class_name
+**Problem:** After adding new `class_name` declarations, `godot --headless --quit` may fail with "unknown class" errors because the class cache file is stale.
+**Fix:** Always run `godot --headless --editor --quit` to rebuild the class cache before running the smoke test. This is mandatory in Phase B.5 and Phase C.
+
+### 15. Death tween races with respawn reset
+**Problem:** A death animation tween (e.g., fading to transparent) is still running when the respawn logic resets `modulate` to opaque. The tween overwrites the reset on its next frame, leaving the player invisible.
+**Fix:** Store tween references (`_death_tween: Tween`). At the start of any reset/respawn function, call `_death_tween.kill()` if the tween exists and is valid before resetting visual state.
+
+---
+
+## Project Conventions
+
+### Autoload Naming Convention
+Autoload scripts that need a `class_name` for type hints must use the `FooClass` pattern:
+- Autoload registered as `EventBus` → script declares `class_name EventBusClass`
+- Autoload registered as `RoomManager` → script declares `class_name RoomManagerClass`
+- Access via the autoload name (`EventBus.signal_name`), not the class_name
+
+### Collision Layer Registry
+
+All agents MUST reference this table when setting `collision_layer` and `collision_mask` on physics bodies and areas.
+
+| Bit | Layer Name | Used By | Notes |
+|-----|-----------|---------|-------|
+| 1 | Environment / Player Body | Player CharacterBody2D, StaticBody2D walls/floors | Player's physical body + all terrain |
+| 2 | Nail Hitbox | Player's attack Area2D | What the player's nail can hit |
+| 4 | Enemy Hurtbox | Enemy damage-receiving Area2D | Where enemies can be hit |
+| 8 | Enemy Hitbox | Enemy attack Area2D, contact damage Area2D | What hurts the player |
+| 16 | Player Hurtbox | Player's damage-receiving Area2D | Where the player can be hit |
+
+**Rules:**
+- `collision_layer` = "what I am" (which layer this body exists on)
+- `collision_mask` = "what I detect" (which layers this body scans for)
+- Area2D triggers (e.g., transition triggers, pickup areas) should use `collision_layer = 0` (they are not a physical thing) and `collision_mask` set to the layer they want to detect
+- Never use raw bit numbers in code comments — always reference the layer name from this table
+
+### Reference Dimensions
+
+All agents MUST reference these values when creating rooms, levels, UI, or any spatial content. Designing content without checking these dimensions causes scale mismatches that require full rework.
+
+| Property | Value | Notes |
+|----------|-------|-------|
+| **Viewport** | 1920 x 1080 | Project window size |
+| **Player sprite** | 256 x 256 | Native sprite sheet frame size |
+| **Player collision capsule** | ~40px radius, ~80px height | Physical body for movement |
+| **Minimum room width** | 2560 (10x player width) | Smallest room should be at least 10 player-widths wide |
+| **Minimum room height** | 960 (3.75x player height) | Smallest room gives ~4 player-heights of vertical space |
+| **Standard tile size** | 64 x 64 | For future tilemap alignment |
+| **Transition trigger collision** | 64 x 256 | Side triggers (vertical); 256 x 64 for top/bottom triggers (horizontal) |
+| **Wall/floor thickness** | 128 | Standard StaticBody2D boundary thickness |
+
+**Room sizing guidance:**
+- Small room: 2560 x 960 (compact corridor or reward room)
+- Medium room: 3840 x 960 (standard exploration/combat room)
+- Large room: 5120 x 1280 (boss arena or multi-platform challenge)
+- Always verify: camera limits match room dimensions, spawn points are within room bounds, entities fit within playable area
+
 ---
 
 ## Adding New Patterns

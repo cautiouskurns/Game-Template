@@ -12,7 +12,7 @@ This workflow is deployed as a **GitHub template repository**. The `project-orch
 
 ```
 1. Open Claude Code       →  claude
-2. Say                    →  " Clone the Game-Template from https://github.com/cautiouskurns/Game-Template.git into this project directory, then run /project-bootstrap to set everything up. "
+2. Say                    →  "Create a new game called my-game using the Game-Template"
 ```
 
 That's it. Claude will clone the template, bootstrap the project, and start the orchestrator — pausing for your approval at every gate. You can also run the steps manually if you prefer (see below).
@@ -726,14 +726,22 @@ Phase B: Implementation (gameplay-dev + ui-dev + content-architect)
 ├── TEAM LEAD presents Phase B results in chat
 └── GIT COMMIT: team lead asks user to approve commit of Phase B work
 
-Phase B.5: Integration Wiring (team lead)
+Phase B.5: Integration Wiring (team lead) — MANDATORY, DO NOT SKIP
 ├── TEAM LEAD verifies cross-agent integration points:
+│     ├── Scene Instantiation: every new .tscn is instantiated or loaded somewhere (no orphaned scenes)
+│     ├── project.godot: main_scene correct, new autoloads registered, input actions present
 │     ├── Signal connections between autoloads and UI/gameplay scripts
 │     ├── Scene node paths match expected hierarchy (especially nested scenes)
 │     ├── Preloaded resources don't create circular dependencies
 │     ├── Autoload references use correct access patterns (not class_name conflicts)
+│     ├── Collision layers match the registry in docs/known-patterns.md
+│     ├── Group membership: nodes in expected groups (player, enemies, etc.)
+│     ├── Spatial dimensions: rooms/levels match Reference Dimensions in docs/known-patterns.md
+│     ├── Cross-feature wiring: features sharing state are connected (e.g., boss + health bar, health + HUD)
+│     ├── Persistent entity survival: Player/HUD survive room transitions
 │     └── Data files (.tres/.json) are loadable by the scripts that reference them
 ├── TEAM LEAD fixes any integration wiring issues directly
+├── CLASS CACHE REBUILD: godot --headless --editor --quit (required if new class_name added)
 ├── SMOKE TEST: headless compile check (godot --headless --quit)
 ├── If smoke test fails → fix and re-run until clean
 └── GIT COMMIT (if fixes were needed): team lead asks user to approve
@@ -1109,15 +1117,17 @@ Transition checklist:
    - Team lead asks user to approve git commit of Phase A work
    - Phase B agents spawned with `team_name`
 
-2. **B → B.5:**
+2. **B → B.5 (MANDATORY — never skip):**
    - All Phase B tasks marked complete
    - Phase B agents shut down
    - Team lead presents Phase B summary in chat
    - Team lead asks user to approve git commit of Phase B work
+   - **Phase B.5 is the single most important quality gate.** Skipping it was the #1 source of bugs in Sprints 1-3. Every integration issue (orphaned scenes, missing HUD instances, wrong collision layers, broken room transitions) would have been caught here.
 
 3. **B.5 → C:**
-   - Team lead completes integration wiring verification (see Phase B.5 checklist)
-   - Headless smoke test passes
+   - Team lead completes ALL integration wiring checks (see Phase B.5 checklist — every item must pass)
+   - Class cache rebuilt (`godot --headless --editor --quit`)
+   - Headless smoke test passes (`godot --headless --quit`)
    - Integration fixes committed (if any)
    - QA can now begin on a stable, integrated codebase
 

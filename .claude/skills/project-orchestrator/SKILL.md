@@ -356,6 +356,7 @@ When beginning a new sprint:
      "phases": {
        "A": { "status": "pending", "agents": [] },
        "B": { "status": "pending", "agents": [] },
+       "B5": { "status": "pending", "checklist": {} },
        "C": { "status": "pending", "agents": [] },
        "D": { "status": "pending" }
      },
@@ -443,8 +444,89 @@ When beginning a new sprint:
 4. Keep asset-artist running from Phase A
 5. Create tasks via TaskCreate for each feature, with `addBlockedBy` for dependencies
 
-**Transition to Phase C when:**
+**Transition to Phase B.5 when:**
 - All Phase B tasks are marked complete in TaskList
+
+---
+
+### Phase B.5: Integration Wiring (Team Lead)
+
+**This phase is MANDATORY.** The team lead (you) personally verifies that all pieces built by independent agents actually connect. Skipping this phase was the #1 source of bugs in early sprints.
+
+1. Update sprint `current_phase` → `"B5"`, Phase B5 status → `"in_progress"`
+2. Write state file
+3. Shut down all Phase B agents (they're done implementing)
+4. Run the integration checklist below **in order**:
+
+#### Integration Checklist
+
+**Scene Instantiation Verification:**
+- [ ] Every new `.tscn` created this sprint is instantiated or loaded by at least one other scene or script
+- [ ] No orphaned scenes (search for `ExtResource` or `load()`/`preload()` references to each new scene)
+- [ ] New UI scenes are added to the correct parent (e.g., HUD children go in `hud.tscn`)
+
+**project.godot Verification:**
+- [ ] `run/main_scene` points to the correct scene
+- [ ] All new autoloads are registered in `[autoload]` section
+- [ ] Input map includes any new actions added this sprint
+
+**Signal Wiring Verification:**
+- [ ] Every signal emitted by new code has at least one listener connected
+- [ ] Every signal listener references a signal that actually exists in EventBus or the emitting node
+- [ ] No duplicate signal connections (idempotency check)
+
+**Collision Layer Verification:**
+- [ ] New physics bodies use the correct collision layers per `docs/known-patterns.md` registry
+- [ ] `collision_layer` (what I am) and `collision_mask` (what I detect) are not confused
+- [ ] Area2D triggers have `collision_layer = 0` and `collision_mask` set to the target layer
+
+**Group Membership Verification:**
+- [ ] Nodes expected to be in groups (e.g., `"player"`, `"enemies"`) are added via `.add_to_group()` or scene property
+- [ ] Code that calls `get_nodes_in_group()` or `is_in_group()` references groups that actually exist
+
+**Naming Convention Verification:**
+- [ ] Autoload scripts do NOT use `class_name` that matches the autoload name (use `FooClass` pattern)
+- [ ] No `class_name` conflicts between scripts
+
+**Spatial/Dimension Verification:**
+- [ ] New rooms/levels use dimensions consistent with `docs/known-patterns.md` Reference Dimensions
+- [ ] Spawned entities are positioned within room bounds
+- [ ] Camera limits match room dimensions
+
+**Cross-Feature Integration:**
+- [ ] Features that share state (e.g., health system + HUD, boss + health bar) are actually wired together
+- [ ] Room transitions preserve persistent entities (player, HUD)
+- [ ] Save/load (if applicable) covers new state introduced this sprint
+
+#### After Checklist
+
+5. Run class cache rebuild: `godot --headless --editor --quit`
+6. Run smoke test: `godot --headless --quit 2>&1`
+7. If issues found → fix them directly, re-run smoke test
+8. Record results in state:
+   ```json
+   "B5": {
+     "status": "completed",
+     "checklist": {
+       "orphaned_scenes": "passed",
+       "project_godot": "passed",
+       "signals": "passed",
+       "collision_layers": "passed",
+       "groups": "passed",
+       "naming": "passed",
+       "dimensions": "passed",
+       "cross_feature": "passed"
+     },
+     "issues_found": 0,
+     "issues_fixed": 0,
+     "smoke_test": "passed"
+   }
+   ```
+9. GIT COMMIT (if fixes were needed): ask user to approve
+
+**Transition to Phase C when:**
+- All checklist items pass
+- Smoke test passes
 
 ---
 
@@ -477,26 +559,40 @@ When beginning a new sprint:
 
 ### Phase C Exit: Headless Smoke Test
 
-**Before transitioning to Phase D**, run the Godot headless smoke test:
+**Before transitioning to Phase D**, run the Godot headless smoke test.
 
-```bash
-godot --headless --quit 2>&1
-```
+**IMPORTANT — Godot Path:** The Godot binary may not be in PATH. Check the sprint state for `godot_path`. If not set, try these locations in order:
+1. `godot` (if in PATH)
+2. `/Users/*/Downloads/Godot.app/Contents/MacOS/Godot` (macOS download)
+3. Ask the user for the path
 
-This catches compile/parse errors that would waste user time:
-- Script syntax errors
-- `class_name` conflicts with autoload singletons
-- Missing dependencies or broken resource references
+Once found, record it in the sprint state as `"godot_path"` so future sprints don't need to search again.
 
 **Procedure:**
-1. After all QA fixes are applied, run the headless test via Bash
-2. **If errors are found:**
+1. After all QA fixes are applied, **rebuild the class cache first**:
+   ```bash
+   [godot_path] --headless --editor --quit 2>&1
+   ```
+   This is required whenever new `class_name` declarations were added this sprint. Skipping it causes stale cache errors that look like missing classes.
+
+2. Run the headless smoke test:
+   ```bash
+   [godot_path] --headless --quit 2>&1
+   ```
+
+3. This catches compile/parse errors that would waste user time:
+   - Script syntax errors
+   - `class_name` conflicts with autoload singletons
+   - Missing dependencies or broken resource references
+
+4. **If errors are found:**
    - Read the error output and diagnose
    - Fix the issues directly (you are the team lead)
+   - Rebuild class cache again if you changed any `class_name` declarations
    - Re-run the headless test
    - Repeat until it passes cleanly
-3. **If clean:** Update state and transition to Phase D
-4. Record the smoke test result in the sprint state:
+5. **If clean:** Update state and transition to Phase D
+6. Record the smoke test result in the sprint state:
    ```json
    "smoke_test": { "status": "passed", "attempts": 2, "errors_fixed": ["class_name conflict", "missing resource"] }
    ```
