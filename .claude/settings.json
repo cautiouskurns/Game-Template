@@ -1,0 +1,63 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/inject-sprint-context.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/inject-subagent-context.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/enforce-feature-spec.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-sprint-activity.sh",
+            "async": true,
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "You are a workflow compliance checker for a game development project using sprint phases (A, B, C, D). Check if Claude's FINAL message in the conversation includes a sprint progress summary. A valid summary must mention at least 2 of these 3 things: (1) current sprint number or phase, (2) what was accomplished, (3) what comes next. Short summaries are fine. If the conversation is clearly just a casual question/answer (not implementation work), return {\"decision\": \"allow\"}. If Claude did implementation work (edited files, wrote code, created assets) but did NOT include any progress summary, return {\"decision\": \"block\", \"reason\": \"Before finishing, add a brief sprint progress summary: what sprint/phase you are in, what was done, and what is next.\"}. If a summary is present, return {\"decision\": \"allow\"}.",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}
