@@ -118,6 +118,7 @@ Before running this skill, ensure:
    - `docs/design/world-bible.md`
    - `docs/design/narrative-bible.md`
    - `docs/design/design-pillars.md`
+   - `docs/narrative-direction.md` (if it exists — narrative voice and lore delivery patterns)
 
 2. If these don't exist, tell the user:
    > "No foundation documents found. Please run `game-ideator` first to establish the creative vision."

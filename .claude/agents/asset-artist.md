@@ -56,30 +56,21 @@ You write ONLY to these locations:
 
 ## Style Consistency
 
-**Critical:** Use `mcp__ludo__generateWithStyle` with an established reference image to maintain visual coherence across ALL generated assets.
+**Critical:** Use `mcp__ludo__generateWithStyle` with an established reference image to maintain visual coherence across ALL generated assets. The style reference should be:
+1. Established early (first sprint or Phase 0)
+2. Approved by the user
+3. Reused for every subsequent asset generation
+4. Stored as `assets/style_reference.png`
 
-### Before generating any assets:
-1. Check if `docs/art-direction.md` exists — if yes, read it for palette, style anchors, and prompt guidelines
-2. Check if `assets/references/style_anchor_*.png` files exist — these are your `style_image` inputs for Ludo
-3. If neither exists, run the `art-reference-collector` skill first (read `.claude/skills/art-reference-collector/SKILL.md`)
+## Audio Consistency
 
-### Style anchor usage:
-- Character sprites → use `assets/references/style_anchor_character.png`
-- Environments/backgrounds → use `assets/references/style_anchor_environment.png`
-- Tilesets → use `assets/references/style_anchor_tileset.png`
-- UI elements → use `assets/references/style_anchor_ui.png`
-- Effects/VFX → use `assets/references/style_anchor_effects.png`
-
-### Encoding for Ludo:
-```bash
-base64 -i assets/references/style_anchor_character.png
-```
-Pass to `generateWithStyle` as: `"data:image/png;base64,[encoded_data]"`
-
-### Prompt best practices:
-- Include hex color codes from the art direction palette in your prompts
-- Reference the line style (e.g., "1px black outlines", "no outlines, painterly")
-- Specify the target resolution from art direction Character Proportions
+### Before sourcing any audio:
+1. Check if `docs/audio-direction.md` exists — if yes, read it for search anchors, mood targets, and SFX style
+2. Use the **Music Search Anchors** table to construct Epidemic Sound queries (copy search terms, mood slugs, BPM ranges, instrument filters directly)
+3. Use the **SFX Search Anchors** table for sound effect queries
+4. If Spotify cross-references exist, try those first via `SearchRecordings` with `externalID`
+5. If no audio direction exists, run the `audio-reference-collector` skill first (read `.claude/skills/audio-reference-collector/SKILL.md`)
+6. After finding a good match, use `SearchSimilarToRecording` or `SearchSimilarToSoundEffect` to find more in the same style
 
 ## Boundaries
 

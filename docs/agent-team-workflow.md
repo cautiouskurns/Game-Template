@@ -12,7 +12,7 @@ This workflow is deployed as a **GitHub template repository**. The `project-orch
 
 ```
 1. Open Claude Code       →  claude
-2. Say                    →  "Create a new game called my-game using the Game-Template"
+2. Say                    →  "Clone the Game-Template from https://github.com/cautiouskurns/Game-Template.git into this project directory, then run /project-bootstrap to set everything up."
 ```
 
 That's it. Claude will clone the template, bootstrap the project, and start the orchestrator — pausing for your approval at every gate. You can also run the steps manually if you prefer (see below).
@@ -70,6 +70,9 @@ Phase 0 Design Pipeline (orchestrator guides you through each step):
 Step 0.1: game-concept-generator  → You select a concept direction
 Step 0.2: concept-validator       → You review feasibility risks
 Step 0.3: design-bible-updater    → You approve design pillars and tone
+Step 0.3a: art-reference-collector    → You approve art direction and style anchors (optional)
+Step 0.3b: audio-reference-collector  → You approve audio direction and search anchors (optional)
+Step 0.3c: narrative-reference-collector → You approve narrative direction and templates (optional)
 Step 0.4: prototype-gdd-generator → You approve the Game Design Document
 Step 0.5: prototype-roadmap-planner → You approve the sprint breakdown
 Step 0.6: feature pipeline        → You approve each Sprint 1 feature spec
@@ -400,6 +403,9 @@ When an agent reaches a control point, they **stop and present you with**:
 | `game-concept-generator` | Initial ideation and concept exploration |
 | `game-ideator` | Deep creative foundation and inspiration when exploring new directions |
 | `narrative-architect` | Story and character foundations that inform content-architect's data files |
+| `art-reference-collector` | Collating visual references and establishing art direction for asset generation |
+| `audio-reference-collector` | Collating audio references and establishing search anchors for Epidemic Sound |
+| `narrative-reference-collector` | Analyzing narrative style and creating templates for dialogue, lore, and worldbuilding |
 | `tool-spec-generator` | Writing specifications for development tools, editor plugins, utilities |
 | `tool-roadmap-planner` | Breaking tool specs into phased implementation roadmaps |
 
@@ -1459,6 +1465,15 @@ Before sprints begin, design-lead runs the design pipeline. **Every step pauses 
 
 3. design-bible-updater        → Establish pillars, vision, tone
    🔒 USER APPROVES design pillars (these guide ALL future decisions)
+
+3a. art-reference-collector     → Collate visual references, establish art direction (optional)
+   🔒 USER APPROVES art direction and style anchors
+
+3b. audio-reference-collector   → Collate audio references, establish search anchors (optional)
+   🔒 USER APPROVES audio direction and search anchors
+
+3c. narrative-reference-collector → Analyze narrative style, create templates (optional)
+   🔒 USER APPROVES narrative direction and templates
 
 4. prototype-gdd-generator     → Create the GDD through Q&A WITH USER
    🔒 USER APPROVES final GDD

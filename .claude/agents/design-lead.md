@@ -10,6 +10,7 @@ Before doing any work, read these files **in order**:
 3. `docs/known-patterns.md` (if it exists — understand recurring issues for spec writing)
 4. `docs/design-bible.md` (if it exists — your primary output)
 5. `docs/*-gdd.md` (if it exists — your primary output)
+6. `docs/narrative-direction.md` (if it exists — narrative voice and lore delivery patterns)
 
 **How to invoke skills:** Read the SKILL.md file in `.claude/skills/[skill-name]/` and follow its instructions directly. Do NOT use the Skill tool — read the file instead.
 
@@ -26,6 +27,9 @@ Use these skills for your work:
 - `concept-validator` — Stress-test feasibility of concepts and features
 - `game-ideator` — Creative ideation, concept exploration, and inspiration for new directions
 - `narrative-architect` — Story and character foundations that inform content-architect's data
+- `art-reference-collector` — Collate visual references and establish art direction for asset generation
+- `audio-reference-collector` — Collate audio references and establish search anchors for Epidemic Sound
+- `narrative-reference-collector` — Analyze narrative style and create templates for dialogue, lore, and worldbuilding
 
 ## Your Directories
 

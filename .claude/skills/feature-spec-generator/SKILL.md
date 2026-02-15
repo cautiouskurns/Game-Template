@@ -398,6 +398,30 @@ These need resolution during implementation:
 
 ---
 
+## 4b. Asset & Narrative Requirements
+
+> **Before writing this section**, check if these direction docs exist and reference them:
+> - `docs/art-direction.md` — style anchors, palette, reference images
+> - `docs/audio-direction.md` — music search anchors, SFX style, mood targets
+> - `docs/narrative-direction.md` — dialogue templates, lore delivery patterns, voice/tone
+
+### Visual Assets Needed
+| Asset | Description | Style Reference | Fallback |
+|-------|-------------|-----------------|----------|
+| [Asset name] | [What it looks like] | [Reference from art-direction.md] | [ColorRect/placeholder] |
+
+### Audio Assets Needed
+| Asset | Description | Search Anchor | Fallback |
+|-------|-------------|---------------|----------|
+| [Music/SFX name] | [Mood, context] | [From audio-direction.md] | [Silence/placeholder] |
+
+### Narrative Content Needed
+| Content | Description | Template/Pattern | Source Doc |
+|---------|-------------|------------------|-----------|
+| [Dialogue, lore, UI text] | [Context and purpose] | [From narrative-direction.md] | [Which direction doc] |
+
+---
+
 ## 5. Visual Design
 
 ### Layout

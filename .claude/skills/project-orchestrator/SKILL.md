@@ -91,6 +91,9 @@ Create `docs/.workflow-state.json` with:
     "game_ideator": { "status": "pending", "artifact": null, "approved_at": null },
     "concept_validator": { "status": "pending", "artifact": null, "approved_at": null },
     "design_bible_updater": { "status": "pending", "artifact": null, "approved_at": null },
+    "art_reference_collector": { "status": "pending", "artifact": null, "approved_at": null },
+    "audio_reference_collector": { "status": "pending", "artifact": null, "approved_at": null },
+    "narrative_reference_collector": { "status": "pending", "artifact": null, "approved_at": null },
     "gdd_generator": { "status": "pending", "artifact": null, "approved_at": null },
     "roadmap_planner": { "status": "pending", "artifact": null, "approved_at": null },
     "feature_pipeline": { "sprint_1_features": [] }
@@ -210,15 +213,87 @@ Options:
 - MODIFY — Provide feedback on pillars/tone for revision
 - REJECT — Discard and start the Design Bible fresh
 
-**On APPROVE:** Mark completed, proceed to Step 0.4
+**On APPROVE:** Mark completed, proceed to Steps 0.3a/0.3b/0.3c (Reference Collection) or skip to Step 0.4 if user declines
 **On MODIFY:** Gather specific feedback on pillars/tone, revise
 **On REJECT:** Reset to pending, start fresh
 
 ---
 
-### Step 0.4: Prototype GDD
+### Step 0.3a: Art Reference Collection (Optional)
 
 **Precondition:** `design_bible_updater` status is `completed` or `skipped`
+
+**Action:**
+1. Update state: step → `"art_reference_collector"`, status → `"in_progress"`
+2. Write state file
+3. Read `.claude/skills/art-reference-collector/SKILL.md`
+4. Follow that skill's instructions: identify reference game, gather images, analyze style, select style anchors
+5. Save output to `docs/art-direction.md` and style anchors to `assets/references/`
+6. Update artifact and status → `"awaiting_user_approval"`
+7. Write state file
+
+**User Gate:**
+STOP. Present a summary of: reference images collected per category, style analysis highlights (palette, line style, scale), which images were selected as style anchors. Reference file `docs/art-direction.md`, then use AskUserQuestion:
+
+Question: "How do you want to proceed with Art Direction?"
+Options:
+- APPROVE — Accept the art direction, proceed
+- MODIFY — Change style anchors, adjust analysis, add more references
+- SKIP — Skip art direction (asset-artist will use default prompts without style anchors)
+
+---
+
+### Step 0.3b: Audio Reference Collection (Optional)
+
+**Precondition:** `design_bible_updater` status is `completed` or `skipped`
+
+**Action:**
+1. Update state: step → `"audio_reference_collector"`, status → `"in_progress"`
+2. Write state file
+3. Read `.claude/skills/audio-reference-collector/SKILL.md`
+4. Follow that skill's instructions: research audio identity, find Epidemic Sound matches, build search anchor tables
+5. Save output to `docs/audio-direction.md`
+6. Update artifact and status → `"awaiting_user_approval"`
+7. Write state file
+
+**User Gate:**
+STOP. Present a summary of: audio identity analysis (genre, mood, instrumentation), Epidemic Sound matches found per context, search anchor table. Reference file `docs/audio-direction.md`, then use AskUserQuestion:
+
+Question: "How do you want to proceed with Audio Direction?"
+Options:
+- APPROVE — Accept the audio direction, proceed
+- MODIFY — Adjust mood targets, add references, change priorities
+- SKIP — Skip audio direction (asset-artist will search Epidemic Sound ad-hoc)
+
+---
+
+### Step 0.3c: Narrative Reference Collection (Optional)
+
+**Precondition:** `design_bible_updater` status is `completed` or `skipped`
+
+**Action:**
+1. Update state: step → `"narrative_reference_collector"`, status → `"in_progress"`
+2. Write state file
+3. Read `.claude/skills/narrative-reference-collector/SKILL.md`
+4. Follow that skill's instructions: analyze story structure, dialogue voice, lore delivery, worldbuilding patterns
+5. Save output to `docs/narrative-direction.md`
+6. Update artifact and status → `"awaiting_user_approval"`
+7. Write state file
+
+**User Gate:**
+STOP. Present a summary of: narrative structure (model, lore hierarchy, dialogue voice), emotional design targets, key templates created. Reference file `docs/narrative-direction.md`, then use AskUserQuestion:
+
+Question: "How do you want to proceed with Narrative Direction?"
+Options:
+- APPROVE — Accept the narrative direction, proceed
+- MODIFY — Adjust tone, change lore delivery priorities, add references
+- SKIP — Skip narrative direction (downstream skills use their own defaults)
+
+---
+
+### Step 0.4: Prototype GDD
+
+**Precondition:** `design_bible_updater` status is `completed` or `skipped`. Reference collectors (0.3a-c) are `completed`, `skipped`, or `pending` (they don't block the GDD).
 
 **Action:**
 1. Update state: step → `"gdd_generator"`, status → `"in_progress"`
@@ -397,7 +472,9 @@ When beginning a new sprint:
    Task: name="asset-artist", subagent_type="general-purpose", team_name="sprint-N"
    Prompt: "You are the asset-artist agent. Read .claude/agents/asset-artist.md for your role.
    Read CLAUDE.md and docs/agent-team-workflow.md for context.
-   Your task: begin generating visual and audio assets for Sprint N features: [list]"
+   Check for docs/art-direction.md — if it exists, read it for style anchors and palette.
+   Check for docs/audio-direction.md — if it exists, read it for music/SFX search anchors.
+   Your task: generate visual and audio assets for Sprint N features: [list]"
    ```
 
 4. Create tasks via TaskCreate for each agent's work, with dependencies

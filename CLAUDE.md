@@ -64,6 +64,9 @@ Before starting work, read the relevant project context:
 | `docs/systems-bible.md` | Technical documentation of how systems work (when it exists) |
 | `docs/architecture.md` | Project structure, scene trees, signal maps (when it exists) |
 | `CHANGELOG.md` | What has changed and when (when it exists) |
+| `docs/art-direction.md` | Visual style guide with palette and style anchors (when it exists) |
+| `docs/audio-direction.md` | Audio style guide with search anchors (when it exists) |
+| `docs/narrative-direction.md` | Narrative voice and lore delivery patterns (when it exists) |
 | `docs/.workflow-state.json` | Current workflow position, sprint state, approval history |
 
 ## GDScript Conventions

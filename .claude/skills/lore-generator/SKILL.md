@@ -695,6 +695,12 @@ User: "Write an in-game book about the Age of Kings"
    - Dramatic beats and pacing
    - Player character arc
 
+3b. **Narrative Direction** (`docs/narrative-direction.md`, if it exists)
+   - Dialogue voice and tone templates
+   - Lore delivery patterns (environmental, collectible, dialogue)
+   - Naming conventions for characters, places, items
+   - Prose style guidelines for in-game text
+
 4. **Game Pillars** (`docs/game-pillars.md`, `docs/*pillars*.md`)
    - Core design pillars
    - Player fantasy
