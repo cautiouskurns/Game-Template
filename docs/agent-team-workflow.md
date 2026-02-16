@@ -785,6 +785,47 @@ Phase D: Sprint Review (USER — iterative review loop)
 
 **Phase D is mandatory.** Agents do not begin the next sprint until the user has reviewed and approved. This is the primary creative control mechanism.
 
+### Sprint & Task Progress Tracking
+
+The roadmap document (`docs/*-roadmap.md`) is a **living checklist**, not a static plan. As sprints and tasks are completed, they must be marked off so progress is always visible at a glance.
+
+**When to update the roadmap:**
+
+| Event | What to Mark |
+|-------|-------------|
+| Feature spec approved | Mark the feature's spec task as done in the roadmap |
+| Phase A complete | Mark all Phase A tasks as done |
+| Phase B complete | Mark all Phase B tasks as done |
+| Phase B.5 complete | Mark integration verification as done |
+| Phase C complete | Mark QA tasks as done |
+| Sprint accepted (Phase D) | Mark the entire sprint as complete |
+| Lifecycle gate passed | Mark the gate as passed with the decision |
+
+**Roadmap checkbox format:**
+
+```markdown
+## Sprint N: "[Deliverable]"  ✅ COMPLETE
+
+### Phase A — Spec & Foundation
+- [x] DL-N.1: Write feature spec for [feature]
+- [x] SYS-N.1: Implement [system]
+- [x] ART-N.1: Generate [assets]
+
+### Phase B — Implementation
+- [x] GP-N.1: Implement [gameplay feature]
+- [x] UI-N.1: Build [UI element]
+- [x] CA-N.1: Create [data files]
+
+### Phase D — Sprint Review
+- [x] User playtested and approved
+```
+
+**Rules:**
+- The team lead updates the roadmap at every phase transition (same time as updating the workflow state file)
+- Incomplete tasks that carry over get a note: `- [ ] GP-N.2: [task] ⏩ carried to Sprint N+1`
+- The user can check the roadmap at any time to see exactly what's been done and what remains
+- The roadmap and the workflow state file must stay in sync — if one says a sprint is complete, the other must agree
+
 ### Headless Smoke Test
 
 Before presenting a sprint for user review, run Godot in headless mode to catch compile/parse errors:
@@ -944,6 +985,89 @@ For each feature:
 5. Re-runs the headless smoke test (`godot --headless --quit`)
 6. Asks the user to test again
 7. Repeats until the user is satisfied, then re-presents the formal approval gate
+
+### Playtesting Direction (after every feature and sprint)
+
+Every feature implementation and every sprint completion must include **specific, actionable playtesting instructions** for the user. The user should never have to guess what to test or how to verify that a feature works correctly.
+
+**When to provide playtesting direction:**
+
+| Trigger | Who Provides | Where |
+|---------|-------------|-------|
+| Feature implementation complete | The implementing agent (in their implementation report) | Inline in the report |
+| Phase B complete | Team lead (compiling from all agent reports) | In the Phase B summary presented in chat |
+| Sprint review (Phase D) | Team lead (comprehensive) | In the Sprint Review and as a standalone section |
+| Phase D fix applied | Team lead (targeted) | Inline after the fix description |
+
+**Feature-level playtest direction format:**
+
+After every feature is implemented, the agent must include a "How to Test" section:
+
+```markdown
+## How to Test: [Feature Name]
+
+### Setup
+- [How to reach the feature — which scene to run, what day/level to be on, etc.]
+- [Any prerequisites — e.g., "play through to day 3" or "open the rulebook first"]
+
+### What to Verify
+1. **[Core behavior]:** [Step-by-step action and expected result]
+2. **[Edge case]:** [Step-by-step action and expected result]
+3. **[Integration point]:** [How this feature interacts with existing features]
+4. **[Visual/audio check]:** [What should look/sound right]
+
+### Known Limitations
+- [Anything that isn't implemented yet or is placeholder]
+
+### What Good Looks Like
+- [Description of the ideal user experience when the feature works correctly]
+```
+
+**Sprint-level playtest direction format:**
+
+At sprint review (Phase D), the team lead must present a comprehensive playtest guide:
+
+```markdown
+## Sprint N Playtest Guide
+
+### Quick Start
+- Launch: [exact scene or method to start]
+- Duration: [expected play session length]
+- Focus: [what this sprint primarily added/changed]
+
+### Playtest Checklist
+
+#### New Features
+- [ ] **[Feature 1]:** [1-2 sentence test instruction]
+  - Try: [specific action to attempt]
+  - Expect: [what should happen]
+- [ ] **[Feature 2]:** [1-2 sentence test instruction]
+  - Try: [specific action to attempt]
+  - Expect: [what should happen]
+
+#### Regression Checks (previously working features)
+- [ ] **[Existing feature 1]:** [Quick verification it still works]
+- [ ] **[Existing feature 2]:** [Quick verification it still works]
+
+#### Edge Cases to Explore
+- [ ] [What happens if the user does X unexpectedly?]
+- [ ] [What happens at boundary conditions?]
+
+#### Look & Feel
+- [ ] Visual: [What should look polished, what's still placeholder]
+- [ ] Audio: [What should have sound, what's silent]
+- [ ] Game feel: [What should feel responsive, what might feel off]
+
+### Known Issues
+- [List of known bugs or incomplete features — so the user doesn't report them]
+```
+
+**Rules:**
+- Playtesting direction is **not optional** — it's a mandatory deliverable alongside the code
+- Directions must be specific enough that someone unfamiliar with the code can follow them
+- Always distinguish between "what should work" and "what's known to be incomplete"
+- Include regression checks for previously working features, not just new additions
+- The playtest checklist becomes the user's scorecard for Phase D approval
 
 ### Feature Implementation Flow (per feature, per agent)
 
