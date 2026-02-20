@@ -38,7 +38,7 @@ DIRECTORY OWNERSHIP (only write to your owned directories):
   systems-dev: scripts/autoloads/, scripts/systems/, scripts/resources/, resources/
   gameplay-dev: scenes/gameplay/, scripts/entities/, scripts/components/
   ui-dev: scenes/ui/, scripts/ui/, resources/themes/
-  content-architect: resources/*.tres (data instances)
+  content-architect: data/, resources/*.tres (data instances)
   asset-artist: assets/
 
 RULES:
@@ -48,7 +48,9 @@ RULES:
 4. Do NOT add class_name that matches an autoload name.
 5. Feature specs in docs/features/ define what to implement. Read them before coding.
 6. Run smoke test (godot --headless --quit) after making changes if possible.
-7. When done, report what you changed and any integration points other agents need."
+7. When done, use the Feature Delivery Card format from .claude/skills/project-orchestrator/report-formats.md to report what you built.
+8. SKILL PROTOCOL: Before implementing any feature, read the skill file for your phase from .claude/skills/project-orchestrator/skill-registry.json. The enforce-skill-read hook will block writes if you skip this.
+9. OUTPUT FORMAT: Use structured report formats from .claude/skills/project-orchestrator/report-formats.md for all status updates and deliveries."
 
 # Escape for JSON
 ESCAPED=$(python3 -c "

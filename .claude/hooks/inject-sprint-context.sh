@@ -36,10 +36,22 @@ for s in sprints:
         break
 
 sprint_name = current.get('name', 'Unknown') if current else 'Unknown'
+
+# Find current epic
+epic_name = 'None'
+epic_num = None
+if current:
+    epic_num = current.get('epic_number')
+if epic_num is not None:
+    for e in data.get('epics', []):
+        if e.get('epic_number') == epic_num:
+            epic_name = e.get('name', 'Unknown')
+            break
+
 features = []
 if current:
     for f in current.get('features', []):
-        features.append(f'{f.get(\"name\", \"?\")} ({f.get(\"status\", \"?\")})')
+        features.append(f'{f.get("name", "?")} ({f.get("status", "?")})')
 
 phase_status = {}
 if current:
@@ -50,9 +62,13 @@ if current:
 summary_lines = [
     f'WORKFLOW STATE — READ THIS BEFORE DOING ANY WORK:',
     f'  Lifecycle: {lifecycle}',
-    f'  Sprint {sprint}: \"{sprint_name}\"',
-    f'  Current Phase: {phase} (status: {status})',
 ]
+if epic_num is not None:
+    summary_lines.append(f'  Epic {epic_num}: "{epic_name}"')
+summary_lines.extend([
+    f'  Sprint {sprint}: "{sprint_name}"',
+    f'  Current Phase: {phase} (status: {status})',
+])
 if substep:
     summary_lines.append(f'  Substep: {substep}')
 
@@ -68,6 +84,8 @@ summary_lines.extend([
     '2. Follow the workflow defined in docs/agent-team-workflow.md.',
     '3. Do NOT skip phases or approval gates.',
     '4. Read docs/.workflow-state.json for full details if needed.',
+    '5. Before executing any workflow step, the required skill must be read per .claude/skills/project-orchestrator/skill-registry.json.',
+    '6. Use the structured report formats from .claude/skills/project-orchestrator/report-formats.md for all status updates, deliveries, and transitions.',
 ])
 
 context = '\\n'.join(summary_lines)
