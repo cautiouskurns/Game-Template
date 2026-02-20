@@ -94,10 +94,12 @@ Create `docs/.workflow-state.json` with:
     "art_reference_collector": { "status": "pending", "artifact": null, "approved_at": null },
     "audio_reference_collector": { "status": "pending", "artifact": null, "approved_at": null },
     "narrative_reference_collector": { "status": "pending", "artifact": null, "approved_at": null },
+    "game_vision_generator": { "status": "pending", "artifact": null, "approved_at": null },
     "gdd_generator": { "status": "pending", "artifact": null, "approved_at": null },
     "roadmap_planner": { "status": "pending", "artifact": null, "approved_at": null },
     "feature_pipeline": { "sprint_1_features": [] }
   },
+  "epics": [],
   "sprints": [],
   "lifecycle_gates": {
     "prototype_gate": { "status": "pending", "decision": null, "decided_at": null },
@@ -108,21 +110,96 @@ Create `docs/.workflow-state.json` with:
 
 ---
 
-## Status Display Format
+## CRITICAL: Skill Invocation Protocol
 
-Always display this dashboard when the orchestrator is invoked or when transitioning between steps:
+Every Phase 0 step and every sprint agent task requires reading a specific skill file.
+The mapping is defined in `skill-registry.json` (in this skill's directory).
+
+Before executing ANY step:
+1. Look up the current step in `skill-registry.json` to find the required `skill` path
+2. Read that skill file using the Read tool
+3. Then proceed with the skill's instructions
+
+A PreToolUse hook (`enforce-skill-read.sh`) enforces this — artifact writes are blocked unless the required skill was read first. A PostToolUse hook (`track-skill-read.sh`) automatically records skill reads in the state file's `skill_reads` field.
+
+This is **NON-NEGOTIABLE** even if you "know" what the skill does. The hooks track reads mechanically and will block writes if the read didn't happen in the current step.
+
+---
+
+## CRITICAL: Structured Output Formats
+
+All status updates, deliveries, and transitions MUST use the standardized report formats defined in:
 
 ```
-╔══════════════════════════════════════════════════╗
-║  Project: [project_name]
-║  Lifecycle: [lifecycle_phase]
-║  Phase: [workflow_position.phase]
-║  Step: [workflow_position.step]
-║  Status: [workflow_position.status]
-╠══════════════════════════════════════════════════╣
-║  Next action: [description of what happens next]
-╚══════════════════════════════════════════════════╝
+.claude/skills/project-orchestrator/report-formats.md
 ```
+
+**Read this file at the start of every session.** It defines templates for:
+- Status dashboard (on every invocation)
+- Phase transition cards (A→B, B→B.5, etc.)
+- Feature delivery cards (when a feature is implemented)
+- Sprint summary cards (sprint start and sprint review)
+- Epic review banners
+- Lifecycle gate banners
+- Integration check reports
+- Document update logs
+- Fix loop reports
+
+**Rules:**
+- Never freeform a status update — always use the matching template
+- Banners (`══`) for milestones only (sprint start/end, epic reviews, gates)
+- Cards (`──`) for deliverables (features, phase completions, artifacts)
+- Logs for supporting details (doc updates, file lists)
+
+---
+
+## CRITICAL: Report Delivery Protocol (Hook-Enforced)
+
+A PreToolUse hook (`enforce-report-delivery.sh`) blocks ALL artifact writes when `pending_reports` in the state file is non-empty. This ensures reports are always delivered at transition points.
+
+### How It Works
+
+1. When you reach a transition point, **set `pending_reports`** in the state file with the required report type(s)
+2. **Present the report** using the correct format from `report-formats.md`
+3. **Clear `pending_reports`** (set to `[]`) in the state file
+4. Now artifact writes are unblocked and you can continue
+
+### Transition → Required Report Mapping
+
+| Transition | Set `pending_reports` to | Report Format |
+|------------|--------------------------|---------------|
+| Sprint Phase D approved (CONTINUE) | `["sprint_end_review"]` | Sprint End Review (#4) |
+| Starting a new sprint (before Phase A) | `["sprint_start"]` | Sprint Start Card (#4) |
+| All sprints in epic completed | `["epic_review"]` | Epic Review Banner (#5) |
+| Lifecycle gate reached | `["lifecycle_gate"]` | Lifecycle Gate Banner (#6) |
+| Phase B.5 completed | `["integration_check"]` | Integration Check Report (#8) |
+| Phase A→B, B→B.5, C→D | `["phase_transition"]` | Phase Transition Card (#2) |
+
+### Multiple Reports
+
+When multiple reports are required at the same transition (e.g., sprint completes AND epic completes), set all of them:
+```json
+"pending_reports": ["sprint_end_review", "epic_review"]
+```
+
+Present each report in order, then clear `pending_reports` to `[]`.
+
+### Example Flow: Sprint Completion → Next Sprint
+
+```
+1. User approves Sprint N Phase D → CONTINUE
+2. Write state: sprint.current_phase = "completed", pending_reports = ["sprint_end_review"]
+3. Present Sprint End Review card (format #4)
+4. Check: is this the last sprint in the epic?
+   - If YES: write state: pending_reports = ["epic_review", "sprint_start"]
+   - If NO: write state: pending_reports = ["sprint_start"]
+5. Present Epic Review banner if required (format #5)
+6. Present Sprint Start card (format #4)
+7. Write state: pending_reports = []
+8. NOW you can write feature specs and other artifacts
+```
+
+This is **NON-NEGOTIABLE**. The hook will block writes to `docs/features/`, `scripts/`, `scenes/`, and all other artifact paths until `pending_reports` is empty.
 
 ---
 
@@ -209,7 +286,7 @@ STOP. Present a summary of the design pillars, vision statement, and creative di
 
 Question: "How do you want to proceed with the Design Bible?"
 Options:
-- APPROVE — Accept the design pillars and creative direction, proceed to Prototype GDD
+- APPROVE — Accept the design pillars and creative direction, proceed to Full Game Vision
 - MODIFY — Provide feedback on pillars/tone for revision
 - REJECT — Discard and start the Design Bible fresh
 
@@ -291,15 +368,44 @@ Options:
 
 ---
 
-### Step 0.4: Prototype GDD
+### Step 0.4: Full Game Vision
 
-**Precondition:** `design_bible_updater` status is `completed` or `skipped`. Reference collectors (0.3a-c) are `completed`, `skipped`, or `pending` (they don't block the GDD).
+**Precondition:** `design_bible_updater` status is `completed` or `skipped`. Reference collectors (0.3a-c) are `completed`, `skipped`, or `pending` (they don't block the vision).
+
+**Action:**
+1. Update state: step → `"game_vision_generator"`, status → `"in_progress"`
+2. Write state file
+3. Read `.claude/skills/game-vision-generator/SKILL.md`
+4. Follow that skill's instructions: work through the interactive visioning process with the user to capture the complete game
+5. Save output to `docs/game-vision.md`
+6. Update state: `phase_0_progress.game_vision_generator.artifact` → `"docs/game-vision.md"`
+7. Update state: `status` → `"awaiting_user_approval"`
+8. Write state file
+
+**User Gate:**
+STOP. Present a summary of the vision including: game identity, total mechanics cataloged, scope map breakdown (how many features per lifecycle phase), and key design decisions. Reference file `docs/game-vision.md`. Emphasize that this vision is the master plan — GDDs will scope down from it. Then use AskUserQuestion with these options:
+
+Question: "How do you want to proceed with the Full Game Vision?"
+Options:
+- APPROVE — Accept the vision and proceed to Prototype GDD
+- MODIFY — Provide feedback to adjust mechanics, scope, or priorities
+- REJECT — Discard and restart the vision
+
+**On APPROVE:** Mark completed, proceed to Step 0.5
+**On MODIFY:** Gather specific feedback, revise relevant sections
+**On REJECT:** Reset to pending, start fresh
+
+---
+
+### Step 0.5: Prototype GDD
+
+**Precondition:** `game_vision_generator` status is `completed` or `skipped`. The GDD should reference `docs/game-vision.md` to scope down to prototype-appropriate features.
 
 **Action:**
 1. Update state: step → `"gdd_generator"`, status → `"in_progress"`
 2. Write state file
 3. Read `.claude/skills/gdd-generator/SKILL.md`
-4. Follow that skill's instructions: create the Game Design Document through interactive Q&A
+4. Follow that skill's instructions: create the Game Design Document through interactive Q&A, scoping from the approved Game Vision
 5. Save output to `docs/prototype-gdd.md`
 6. Update artifact and status → `"awaiting_user_approval"`
 7. Write state file
@@ -313,13 +419,13 @@ Options:
 - MODIFY — Provide feedback to revise specific sections
 - REJECT — Discard and restart the GDD
 
-**On APPROVE:** Mark completed, proceed to Step 0.5
+**On APPROVE:** Mark completed, proceed to Step 0.6
 **On MODIFY:** Gather feedback, revise specific sections
 **On REJECT:** Reset to pending
 
 ---
 
-### Step 0.5: Prototype Roadmap
+### Step 0.6: Prototype Roadmap
 
 **Precondition:** `gdd_generator` status is `completed` or `skipped`
 
@@ -341,13 +447,13 @@ Options:
 - MODIFY — Adjust sprint scope, reorder, or add/remove sprints
 - REJECT — Discard and restart the roadmap
 
-**On APPROVE:** Mark completed, proceed to Step 0.6 (Feature Pipeline)
+**On APPROVE:** Mark completed, proceed to Step 0.7 (Feature Pipeline)
 **On MODIFY:** Gather feedback on sprint scope/ordering, revise
 **On REJECT:** Reset to pending
 
 ---
 
-### Step 0.6: Feature Pipeline (Sprint 1 Features)
+### Step 0.7: Feature Pipeline (Sprint 1 Features)
 
 **Precondition:** `roadmap_planner` status is `completed` or `skipped`
 
@@ -416,7 +522,24 @@ When all Phase 0 steps are `completed` (or `skipped`):
 
 When beginning a new sprint:
 
-1. Read the roadmap to identify this sprint's deliverable and features
+1. Read the roadmap to identify this sprint's deliverable, features, and **parent epic**
+1a. **Validate sprint scope** — check feature count against limits:
+    - Prototype: max 2 features
+    - Vertical Slice: max 3 features
+    - Production: max 4 features
+    If the roadmap assigns more features than the limit, split into multiple sprints and inform the user.
+1b. **Ensure epic exists in state** — if this is the first sprint of an epic, add the epic:
+    ```json
+    {
+      "epic_number": E,
+      "name": "[Player-facing goal from roadmap]",
+      "lifecycle_phase": "[current lifecycle phase]",
+      "status": "in_progress",
+      "sprint_numbers": [N],
+      "review": null
+    }
+    ```
+    If the epic already exists, append this sprint number to `sprint_numbers`.
 2. Create git branch: `git checkout -b sprint/[N]-[short-description]`
 3. Create team: `TeamCreate: team_name="sprint-[N]", description="Sprint [N]: [deliverable]"`
 4. Add sprint entry to state:
@@ -424,6 +547,7 @@ When beginning a new sprint:
    {
      "sprint_number": N,
      "name": "[deliverable slice name]",
+     "epic_number": E,
      "branch": "sprint/N-description",
      "lifecycle_phase": "[current lifecycle phase]",
      "current_phase": "A",
@@ -520,6 +644,30 @@ When beginning a new sprint:
 
 4. Keep asset-artist running from Phase A
 5. Create tasks via TaskCreate for each feature, with `addBlockedBy` for dependencies
+
+**Per-Feature Progress Reports:**
+
+As each feature is completed by an implementing agent, **present a Feature Completion Report to the user**. This is a non-blocking progress update — the sprint continues. Use this format:
+
+```
+## Feature Complete: [Feature Name]
+
+### What Was Built
+[2-3 sentences: what this feature does and why]
+
+### What's Different Now
+- [Visible change 1]
+- [Visible change 2]
+
+### How to Playtest
+1. [Steps to test]
+2. Success: [what confirms it works]
+
+### Known Limitations
+- [Anything not yet wired up or placeholder]
+```
+
+The user does not need to respond. If they raise concerns, address them before continuing. Otherwise proceed to the next feature.
 
 **Transition to Phase B.5 when:**
 - All Phase B tasks are marked complete in TaskList
@@ -673,6 +821,11 @@ Once found, record it in the sprint state as `"godot_path"` so future sprints do
    ```json
    "smoke_test": { "status": "passed", "attempts": 2, "errors_fixed": ["class_name conflict", "missing resource"] }
    ```
+7. **Review captured output:** The `capture-smoke-test.sh` hook automatically logs all smoke test output to:
+   - `docs/sprint-logs/sprint-{N}-smoke-test.log` — Human-readable log with categorized errors/warnings
+   - `docs/sprint-logs/sprint-{N}-smoke-test-latest.json` — Machine-readable summary with error counts
+
+   Read the latest JSON summary to confirm the captured result matches your assessment before proceeding.
 
 **CRITICAL:** Never present Phase D sprint review to the user until the headless smoke test passes. The user should never encounter compile errors.
 
@@ -727,6 +880,7 @@ For each feature:
 
 ## Smoke Test
 - Status: PASSED (N attempts, errors fixed: [list or "none"])
+- Full log: `docs/sprint-logs/sprint-{N}-smoke-test.log`
 
 ## Assets Produced
 - [list with paths]
@@ -808,14 +962,72 @@ Options:
 **On Continue (all features accepted):**
 1. Update Phase D status → `"completed"`, sprint `current_phase` → `"completed"`
 2. Merge sprint branch: `git checkout main && git merge sprint/N-description`
-3. Check if this is the last sprint in the current lifecycle phase:
+3. **Check epic completion** — read the current epic from state. If this was the last sprint in the epic's `sprint_numbers`:
+   - Present the **Epic Review** (see below)
+   - Wait for user decision before proceeding
+4. Check if this is the last sprint in the current lifecycle phase:
    - If YES → proceed to Lifecycle Gate
-   - If NO → proceed to next Sprint Setup
-4. Write state file
+   - If NO → proceed to next Sprint Setup (which begins the next epic if applicable)
+5. Write state file
 
 **On Request Changes (any feature):**
 1. Return to Phase C, re-spawn relevant agents
 2. Update state accordingly
+
+---
+
+## Epic Review
+
+When the final sprint in an epic is completed (all sprint numbers in `epic.sprint_numbers` have `current_phase: "completed"`), present an Epic Review before starting the next epic.
+
+### Presenting the Epic Review
+
+Compile and present this format:
+
+```markdown
+## Epic Review: "[Epic Goal]"
+
+### Goal Assessment
+- Epic goal: [What we set out to achieve]
+- Achieved: [YES / PARTIAL / NO]
+- Evidence: [What the user can now do in-game that proves it]
+
+### Sprints Completed
+- Sprint N: "[deliverable]" — [accepted / partially accepted]
+- Sprint N+1: "[deliverable]" — [accepted / partially accepted]
+
+### Lessons Learned
+- [What worked well]
+- [What to improve for next epic]
+
+### Next Epic Preview
+- Epic: "[Next goal]"
+- Sprints planned: [count]
+- First sprint: "[deliverable]"
+```
+
+Then use AskUserQuestion:
+
+Question: "How do you want to proceed after Epic [N]: '[Goal]'?"
+Options:
+- PROCEED — Move to the next epic
+- ITERATE — Add a fix sprint to address gaps in this epic's goal
+- PAUSE — Pause to reassess direction before continuing
+
+**On PROCEED:**
+1. Update epic status → `"completed"`, set `review.goal_achieved` and `review.user_decision` → `"proceed"`, `review.reviewed_at`
+2. Write state file
+3. Proceed to next Sprint Setup (first sprint of next epic)
+
+**On ITERATE:**
+1. Update epic status → `"iterated"`, set `review.goal_achieved` → `"partial"`, `review.user_decision` → `"iterate"`
+2. Create a new iteration sprint at the end of the epic's `sprint_numbers`
+3. Discuss scope with user, then proceed to Sprint Setup for the iteration sprint
+
+**On PAUSE:**
+1. Update `review.user_decision` → `"pause"`, `review.reviewed_at`
+2. Write state file
+3. Wait for user to resume — on next `/project-orchestrator` invocation, re-present the pause state
 
 ---
 
@@ -834,14 +1046,16 @@ Options:
 **On GO:**
 1. Update `lifecycle_phase` → `"vertical_slice"`
 2. Update `lifecycle_gates.prototype_gate` → `{ status: "completed", decision: "GO" }`
-3. Set `workflow_position` → `{ phase: "phase_0", step: "vertical_slice_gdd" }`
-4. Run `gdd-generator` (vertical slice mode) → then `roadmap-planner` (vertical slice mode) → then feature pipeline
-5. Then begin Vertical Slice sprints
+3. **Update the Game Vision** — Read `.claude/skills/game-vision-generator/SKILL.md` and update `docs/game-vision.md` based on prototype learnings (what worked, what didn't, scope adjustments). Present changes for user approval.
+4. Set `workflow_position` → `{ phase: "phase_0", step: "vertical_slice_gdd" }`
+5. Run `gdd-generator` (vertical slice mode, scoping from updated vision) → then `roadmap-planner` (vertical slice mode) → then feature pipeline
+6. Then begin Vertical Slice sprints
 
 **On PIVOT:**
 1. Stay in `prototype`, record pivot reason
-2. Reset to `gdd_generator` step, revise GDD
-3. Plan new prototype sprints
+2. **Update the Game Vision** if the pivot changes the overall game direction
+3. Reset to `gdd_generator` step, revise GDD
+4. Plan new prototype sprints
 
 **On KILL:**
 1. Set `lifecycle_phase` → `"killed"`

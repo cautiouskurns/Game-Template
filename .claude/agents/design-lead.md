@@ -26,7 +26,6 @@ Use these skills for your work:
 - `feature-spec-generator` — Write detailed feature specs (includes idea briefs and full specifications)
 - `concept-validator` — Stress-test feasibility of concepts and features
 - `game-ideator` — Creative ideation, concept exploration, and inspiration for new directions
-- `narrative-architect` — Story and character foundations that inform content-architect's data
 - `art-reference-collector` — Collate visual references and establish art direction for asset generation
 - `audio-reference-collector` — Collate audio references and establish search anchors for Epidemic Sound
 - `narrative-reference-collector` — Analyze narrative style and create templates for dialogue, lore, and worldbuilding

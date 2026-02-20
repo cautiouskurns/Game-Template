@@ -57,6 +57,7 @@
         "game_concept_generator": { "$ref": "#/$defs/step_status" },
         "concept_validator": { "$ref": "#/$defs/step_status" },
         "design_bible_updater": { "$ref": "#/$defs/step_status" },
+        "game_vision_generator": { "$ref": "#/$defs/step_status" },
         "prototype_gdd_generator": { "$ref": "#/$defs/step_status" },
         "prototype_roadmap_planner": { "$ref": "#/$defs/step_status" },
         "feature_pipeline": {
@@ -77,6 +78,34 @@
         }
       }
     },
+    "epics": {
+      "type": "array",
+      "description": "Epics group related sprints into player-facing goals",
+      "items": {
+        "type": "object",
+        "required": ["epic_number", "name", "status"],
+        "properties": {
+          "epic_number": { "type": "integer", "minimum": 1 },
+          "name": { "type": "string", "description": "Player-facing goal (e.g., 'Core Movement & Combat')" },
+          "lifecycle_phase": { "type": "string", "enum": ["prototype", "vertical_slice", "production"] },
+          "status": { "type": "string", "enum": ["pending", "in_progress", "completed", "iterated"] },
+          "sprint_numbers": {
+            "type": "array",
+            "items": { "type": "integer" },
+            "description": "Sprint numbers belonging to this epic"
+          },
+          "review": {
+            "type": ["object", "null"],
+            "description": "Epic review results (set when epic completes)",
+            "properties": {
+              "goal_achieved": { "type": "string", "enum": ["yes", "partial", "no"] },
+              "user_decision": { "type": "string", "enum": ["proceed", "iterate", "pause"] },
+              "reviewed_at": { "type": ["string", "null"], "format": "date-time" }
+            }
+          }
+        }
+      }
+    },
     "sprints": {
       "type": "array",
       "items": {
@@ -85,6 +114,7 @@
         "properties": {
           "sprint_number": { "type": "integer", "minimum": 1 },
           "name": { "type": "string", "description": "Deliverable slice name (e.g., 'Player can move through a world')" },
+          "epic_number": { "type": ["integer", "null"], "description": "Which epic this sprint belongs to" },
           "branch": { "type": "string", "description": "Git branch name" },
           "lifecycle_phase": { "type": "string", "enum": ["prototype", "vertical_slice", "production"] },
           "current_phase": { "type": "string", "enum": ["A", "B", "C", "D", "completed"] },
@@ -117,6 +147,35 @@
       "properties": {
         "prototype_gate": { "$ref": "#/$defs/gate_status" },
         "vertical_slice_gate": { "$ref": "#/$defs/gate_status" }
+      }
+    },
+    "pending_reports": {
+      "type": "array",
+      "description": "Report formats that must be presented before the workflow can advance. Set by the orchestrator at transition points, cleared after reports are delivered. Enforced by enforce-report-delivery.sh hook — artifact writes are blocked while this is non-empty.",
+      "items": {
+        "type": "string",
+        "enum": ["sprint_end_review", "sprint_start", "epic_review", "lifecycle_gate", "integration_check", "phase_transition"]
+      },
+      "default": []
+    },
+    "skill_reads": {
+      "type": "object",
+      "description": "Tracks which skill files have been read in the current workflow step. Populated by track-skill-read.sh hook, checked by enforce-skill-read.sh hook.",
+      "properties": {
+        "current_step": {
+          "type": ["string", "null"],
+          "description": "The workflow step these reads belong to. Resets when step changes."
+        },
+        "reads": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "skill": { "type": "string", "description": "Relative path to the SKILL.md file" },
+              "read_at": { "type": "string", "format": "date-time" }
+            }
+          }
+        }
       }
     }
   },

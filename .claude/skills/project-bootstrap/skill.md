@@ -27,9 +27,27 @@ Users can trigger this skill by saying:
 
 ## Prerequisites
 
-This skill assumes the user has **cloned the template repository** and is now customizing it for a new game. The template should already contain:
+This skill assumes the user has **cloned the template repository directly into the project root** (not into a subdirectory). The clone command should be:
+
+```bash
+git clone https://github.com/cautiouskurns/Game-Template.git .
+```
+
+**IMPORTANT — Clone into root, not a subdirectory:** The template's `.claude/` folder (containing agents, skills, hooks, and settings) MUST be at the project root so Claude Code picks them up. If the user cloned into a subdirectory (e.g., `Game-Template/`), the `.claude/` won't be at the right level and permissions, hooks, and agent definitions won't work.
+
+**Handling existing `.claude/` directory:** When a user opens Claude Code in an empty directory, Claude Code may create a default `.claude/` folder. Before cloning, remove or back up this default folder so the template's `.claude/` takes its place:
+
+```bash
+rm -rf .claude   # Remove default Claude Code folder (template replaces it)
+git clone https://github.com/cautiouskurns/Game-Template.git .
+```
+
+The template should already contain:
 - `.claude/skills/` (all skills)
 - `.claude/agents/` (all 7 agent definitions)
+- `.claude/hooks/` (workflow enforcement hooks)
+- `.claude/settings.json` (hook configuration)
+- `.claude/settings.local.json` (permission allow-list)
 - `docs/agent-team-workflow.md` (workflow document)
 - `CLAUDE.md` (project context)
 - `project.godot` (Godot project config)
@@ -115,10 +133,12 @@ Create the initial workflow state file at `docs/.workflow-state.json`:
     "game_concept_generator": { "status": "pending", "artifact": null, "approved_at": null },
     "concept_validator": { "status": "pending", "artifact": null, "approved_at": null },
     "design_bible_updater": { "status": "pending", "artifact": null, "approved_at": null },
+    "game_vision_generator": { "status": "pending", "artifact": null, "approved_at": null },
     "prototype_gdd_generator": { "status": "pending", "artifact": null, "approved_at": null },
     "prototype_roadmap_planner": { "status": "pending", "artifact": null, "approved_at": null },
     "feature_pipeline": { "sprint_1_features": [] }
   },
+  "epics": [],
   "sprints": [],
   "lifecycle_gates": {
     "prototype_gate": { "status": "pending", "decision": null, "decided_at": null },
@@ -127,32 +147,29 @@ Create the initial workflow state file at `docs/.workflow-state.json`:
 }
 ```
 
-### Step 7: Initialize Git
+### Step 7: Reset Git History
+
+The cloned template has its own git history. Replace it with a fresh repo for this project:
+
+1. **Ask the user:** "The template's git history will be replaced with a fresh repo for TestGame. OK to proceed?"
+2. If confirmed:
 
 ```bash
+rm -rf .git
 git init
 git add -A
 git commit -m "feat: initialize [project-name] from agent team template
 
 Bootstrapped from the Godot agent team template with:
 - 7 agent role definitions
-- 46 development skills
+- 27 development skills
 - Agent team workflow with sprint structure
 - Directory structure per ownership map
 
 Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>"
 ```
 
-### Step 8: Remove Template Git History
-
-Before initializing git, ensure any cloned `.git` directory is removed so the project starts with a clean history:
-
-```bash
-rm -rf .git
-git init
-```
-
-**IMPORTANT:** Always confirm with the user before removing `.git` — they may have intentionally kept the template history.
+3. If the user wants to keep template history, skip the `rm -rf .git` and just commit the bootstrap changes on top.
 
 ### Step 9: Provide Summary
 

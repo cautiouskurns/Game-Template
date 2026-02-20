@@ -12,7 +12,7 @@ Each step requires the previous step to have status `completed` (or `skipped` wi
 pre_phase_0
     ↓
 game_ideator → concept_validator → design_bible_updater →
-gdd_generator → roadmap_planner → feature_pipeline
+game_vision_generator → gdd_generator → roadmap_planner → feature_pipeline
     ↓
 sprint (transition to Sprint 1)
 ```
@@ -24,7 +24,8 @@ sprint (transition to Sprint 1)
 | `game_ideator` | `docs/ideas/game-concepts.md` | User selects concept direction |
 | `concept_validator` | `docs/ideas/concept-validation.md` | User reviews risks, decides to proceed |
 | `design_bible_updater` | `docs/design-bible.md` | User approves pillars and tone |
-| `gdd_generator` | `docs/prototype-gdd.md` | User approves GDD |
+| `game_vision_generator` | `docs/game-vision.md` | User approves full game vision and scope map |
+| `gdd_generator` | `docs/prototype-gdd.md` | User approves GDD (scoped from vision) |
 | `roadmap_planner` | `docs/prototype-roadmap.md` | User approves sprint breakdown |
 | `feature_pipeline` | `docs/ideas/*.md` + `docs/features/*.md` | User approves each idea brief and spec |
 
@@ -98,8 +99,8 @@ vertical_slice → killed     [when: Gate 2 decision = KILL]
 
 | Gate | Triggers When | Skill to Run After |
 |------|--------------|-------------------|
-| Prototype Gate | All prototype sprints completed + approved | `gdd-generator` (vertical slice mode, on GO) |
-| Vertical Slice Gate | All vertical slice sprints completed + approved | `gdd-generator` (production mode, on GO) |
+| Prototype Gate | All prototype sprints completed + approved | Update `game-vision.md`, then `gdd-generator` (vertical slice mode, on GO) |
+| Vertical Slice Gate | All vertical slice sprints completed + approved | Update `game-vision.md`, then `gdd-generator` (production mode, on GO) |
 
 ### Gate Decision Effects
 
@@ -107,15 +108,15 @@ vertical_slice → killed     [when: Gate 2 decision = KILL]
 
 | Decision | Effect |
 |----------|--------|
-| GO | Set `lifecycle_phase` to `vertical_slice`, run `gdd-generator` (vertical slice mode) + `roadmap-planner` (vertical slice mode) |
-| PIVOT | Stay in `prototype`, reset GDD step, re-run design pipeline from `gdd_generator` |
+| GO | Set `lifecycle_phase` to `vertical_slice`, update `game-vision.md` with prototype learnings, then run `gdd-generator` (vertical slice mode) + `roadmap-planner` (vertical slice mode) |
+| PIVOT | Stay in `prototype`, optionally update game vision, reset GDD step, re-run design pipeline from `gdd_generator` |
 | KILL | Set `lifecycle_phase` to `killed`, optionally restart from `game_ideator` |
 
 **Vertical Slice Gate (Gate 2):**
 
 | Decision | Effect |
 |----------|--------|
-| GO | Set `lifecycle_phase` to `production`, run `gdd-generator` (production mode) + `roadmap-planner` (production mode) |
+| GO | Set `lifecycle_phase` to `production`, update `game-vision.md` with VS learnings, then run `gdd-generator` (production mode) + `roadmap-planner` (production mode) |
 | ITERATE | Stay in `vertical_slice`, plan additional polish sprints |
 | RESCOPE | Stay in `vertical_slice`, reduce production scope, update GDD |
 | KILL | Set `lifecycle_phase` to `killed` |
@@ -139,6 +140,7 @@ When the user requests to backtrack to an earlier step:
 | `game_ideator` | All Phase 0 steps + feature pipeline |
 | `concept_validator` | concept_validator through feature pipeline |
 | `design_bible_updater` | design_bible through feature pipeline |
+| `game_vision_generator` | game_vision through feature pipeline |
 | `gdd_generator` | GDD through feature pipeline |
 | `roadmap_planner` | roadmap + feature pipeline |
 | `feature_pipeline` | feature pipeline only |

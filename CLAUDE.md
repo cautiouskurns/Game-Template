@@ -59,7 +59,8 @@ Before starting work, read the relevant project context:
 |------|----------|
 | `docs/agent-team-workflow.md` | Full workflow, roles, sprint structure, quality gates |
 | `docs/design-bible.md` | Design pillars, creative vision, tone (when it exists) |
-| `docs/*-gdd.md` | Game Design Document (when it exists) |
+| `docs/game-vision.md` | Full Game Vision — complete game blueprint with scope map (when it exists) |
+| `docs/*-gdd.md` | Game Design Document, scoped from vision (when it exists) |
 | `docs/features/*.md` | Feature specifications |
 | `docs/systems-bible.md` | Technical documentation of how systems work (when it exists) |
 | `docs/architecture.md` | Project structure, scene trees, signal maps (when it exists) |

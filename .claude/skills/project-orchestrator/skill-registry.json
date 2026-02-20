@@ -1,0 +1,56 @@
+{
+  "version": "1.0.0",
+  "description": "Maps workflow steps to required skill reads. Used by track-skill-read.sh and enforce-skill-read.sh hooks.",
+  "phase_0": {
+    "game_ideator": {
+      "skill": ".claude/skills/game-ideator/SKILL.md",
+      "artifact": "docs/ideas/game-concepts.md"
+    },
+    "concept_validator": {
+      "skill": ".claude/skills/concept-validator/SKILL.md",
+      "artifact": "docs/ideas/concept-validation.md"
+    },
+    "design_bible_updater": {
+      "skill": ".claude/skills/design-bible-updater/SKILL.md",
+      "artifact": "docs/design-bible.md"
+    },
+    "art_reference_collector": {
+      "skill": ".claude/skills/art-reference-collector/SKILL.md",
+      "artifact": "docs/art-direction.md"
+    },
+    "audio_reference_collector": {
+      "skill": ".claude/skills/audio-reference-collector/SKILL.md",
+      "artifact": "docs/audio-direction.md"
+    },
+    "narrative_reference_collector": {
+      "skill": ".claude/skills/narrative-reference-collector/SKILL.md",
+      "artifact": "docs/narrative-direction.md"
+    },
+    "game_vision_generator": {
+      "skill": ".claude/skills/game-vision-generator/SKILL.md",
+      "artifact": "docs/game-vision.md"
+    },
+    "gdd_generator": {
+      "skill": ".claude/skills/gdd-generator/SKILL.md",
+      "artifact_pattern": "docs/*-gdd.md"
+    },
+    "roadmap_planner": {
+      "skill": ".claude/skills/roadmap-planner/SKILL.md",
+      "artifact_pattern": "docs/*-roadmap.md"
+    },
+    "feature_pipeline": {
+      "skill": ".claude/skills/feature-spec-generator/SKILL.md",
+      "artifact_pattern": "docs/features/*.md"
+    }
+  },
+  "sprint": {
+    "B": {
+      "skill": ".claude/skills/feature-implementer/SKILL.md",
+      "artifact_pattern": "scripts/**/*.gd"
+    },
+    "C": {
+      "skill": ".claude/skills/code-reviewer/SKILL.md",
+      "artifact_pattern": "docs/code-reviews/*.md"
+    }
+  }
+}

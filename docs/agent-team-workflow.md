@@ -4,6 +4,184 @@ A structured approach to AI-assisted game development using coordinated agent te
 
 ---
 
+## Workflow Overview
+
+### Development Lifecycle
+
+```mermaid
+graph LR
+    P0["Phase 0<br/>Design Pipeline"] --> PROTO["PROTOTYPE<br/>1-2 epics"]
+    PROTO --> G1{"GO / NO-GO<br/>Gate 1"}
+    G1 -->|GO| VS["VERTICAL SLICE<br/>1-3 epics"]
+    G1 -->|PIVOT| P0
+    G1 -->|KILL| DEAD["Project Killed"]
+    VS --> G2{"GO / NO-GO<br/>Gate 2"}
+    G2 -->|GO| PROD["PRODUCTION<br/>2-5+ epics"]
+    G2 -->|ITERATE| VS
+    G2 -->|RESCOPE| VS
+    G2 -->|KILL| DEAD
+```
+
+### Phase 0: Design Pipeline
+
+```mermaid
+graph LR
+    subgraph CORE["Core Design Steps"]
+        S01["0.1<br/>game-concept-generator"] --> A01{{"USER<br/>APPROVES"}}
+        A01 --> S02["0.2<br/>concept-validator"] --> A02{{"USER<br/>REVIEWS"}}
+        A02 --> S03["0.3<br/>design-bible-updater"] --> A03{{"USER<br/>APPROVES"}}
+    end
+
+    subgraph REF["Reference Collection (optional)"]
+        A03 --> S03A["0.3a<br/>art-reference"]
+        A03 --> S03B["0.3b<br/>audio-reference"]
+        A03 --> S03C["0.3c<br/>narrative-reference"]
+    end
+
+    subgraph VISION["Full Game Vision"]
+        S03A --> S04V
+        S03B --> S04V
+        S03C --> S04V
+        S04V["0.4<br/>game-vision-generator"] --> A04V{{"USER<br/>APPROVES"}}
+    end
+
+    subgraph PLAN["Planning & Specs"]
+        A04V --> S05
+        S05["0.5<br/>gdd-generator"] --> A05{{"USER<br/>APPROVES"}}
+        A05 --> S06["0.6<br/>roadmap-planner"] --> A06{{"USER<br/>APPROVES"}}
+        A06 --> S07["0.7<br/>feature-spec-generator"] --> A07{{"USER<br/>APPROVES"}}
+    end
+
+    A07 --> SPRINT(["Sprint 1 begins"])
+```
+
+### Sprint Structure (Phases A through D)
+
+```mermaid
+graph TB
+    subgraph A["PHASE A — Spec & Foundation"]
+        direction LR
+        A_AGENTS["Agents: design-lead<br/>systems-dev, asset-artist"]
+        A_WORK["Specs finalized<br/>Foundation APIs built<br/>Asset generation started"]
+        A_GATE{{"USER APPROVES specs<br/>APIs ready"}}
+        A_AGENTS --> A_WORK --> A_GATE
+    end
+
+    A_GATE --> A_COMMIT["git commit: Phase A"]
+
+    subgraph B["PHASE B — Implementation (per feature)"]
+        direction LR
+        B_AGENTS["Agents: gameplay-dev<br/>ui-dev, content-architect<br/>asset-artist"]
+        B_WORK["Implement feature<br/>from spec"]
+        B_REPORT["Feature Completion<br/>Report to user<br/>(non-blocking)"]
+        B_MORE{More<br/>features?}
+        B_AGENTS --> B_WORK --> B_REPORT --> B_MORE
+        B_MORE -->|Yes| B_WORK
+        B_MORE -->|No| B_DONE["All features complete"]
+    end
+
+    A_COMMIT --> B
+    B_DONE --> B_COMMIT["git commit: Phase B"]
+
+    subgraph B5["PHASE B.5 — Integration Wiring (MANDATORY)"]
+        direction LR
+        B5_CHECK["Verify:<br/>Scene instantiation<br/>Signal connections<br/>Collision layers<br/>Autoloads, node paths<br/>Cross-feature wiring"]
+        B5_SMOKE{"Smoke test<br/>godot --headless --quit"}
+        B5_CHECK --> B5_SMOKE
+        B5_SMOKE -->|FAIL| B5_CHECK
+    end
+
+    B_COMMIT --> B5
+    B5_SMOKE -->|PASS| B5_COMMIT["git commit: Phase B.5"]
+
+    subgraph C["PHASE C — QA & Documentation"]
+        direction LR
+        C_AGENTS["Agent: qa-docs<br/>+ devs for fixes"]
+        C_WORK["Code review<br/>Systems bible update<br/>Architecture doc update<br/>Changelog update<br/>Fix critical issues"]
+        C_SMOKE{"Final smoke test"}
+        C_AGENTS --> C_WORK --> C_SMOKE
+        C_SMOKE -->|FAIL| C_WORK
+    end
+
+    B5_COMMIT --> C
+    C_SMOKE -->|PASS| C_COMMIT["git commit: Phase C"]
+
+    subgraph D["PHASE D — Sprint Review (Iterative)"]
+        direction LR
+        D_REVIEW["Present sprint review<br/>User playtests"]
+        D_FEEDBACK{"User<br/>feedback?"}
+        D_FIX["Fix issues<br/>Re-run smoke test"]
+        D_ACCEPT{{"USER ACCEPTS<br/>sprint"}}
+        D_REVIEW --> D_FEEDBACK
+        D_FEEDBACK -->|Issues| D_FIX --> D_FEEDBACK
+        D_FEEDBACK -->|Accepted| D_ACCEPT
+    end
+
+    C_COMMIT --> D
+    D_ACCEPT --> D_COMMIT["git commit: sprint complete"]
+    D_COMMIT --> EPIC_CHECK{"Last sprint<br/>in epic?"}
+    EPIC_CHECK -->|No| NEXT_SPRINT["Next Sprint Setup"]
+    EPIC_CHECK -->|Yes| EPIC_REVIEW["EPIC REVIEW<br/>Goal achieved?"]
+    EPIC_REVIEW -->|Proceed| NEXT_EPIC["Next Epic<br/>or Lifecycle Gate"]
+    EPIC_REVIEW -->|Iterate| ITER_SPRINT["Add iteration sprint"]
+    EPIC_REVIEW -->|Pause| PAUSE["Pause development"]
+```
+
+### Hooks & Automation
+
+```mermaid
+graph TB
+    subgraph SESSION["Session Hooks"]
+        direction LR
+        H1["inject-sprint-context<br/>Injects workflow state on start"]
+        H2["inject-subagent-context<br/>Injects rules into agents"]
+        H3["Stop prompt<br/>Requires sprint summary on exit"]
+    end
+
+    subgraph PRE["Pre-Action Gates — block bad writes"]
+        direction LR
+        H4["enforce-feature-spec<br/>New .gd needs specs in docs/features/"]
+        H5["validate-phase-gate<br/>Blocks impl in Phase 0/A<br/>Checks approved specs in state"]
+    end
+
+    subgraph POST["Post-Action — logging and validation"]
+        direction LR
+        H6["log-sprint-activity<br/>Audit trail of file changes"]
+        H7["sync-claude-md<br/>Keeps CLAUDE.md in sync"]
+        H8["log-phase-timing<br/>Instrumentation timing.jsonl"]
+        H9["validate-state-file<br/>JSON + enum validation"]
+        H10["capture-smoke-test<br/>Parses godot output"]
+    end
+
+    SESSION ~~~ PRE ~~~ POST
+```
+
+### Agent Directory Ownership
+
+```mermaid
+graph LR
+    subgraph DESIGN["Design"]
+        DL["design-lead"] --- DL_DIR["docs/design-bible.md<br/>docs/*-gdd.md<br/>docs/features/<br/>docs/ideas/"]
+    end
+
+    subgraph CODE["Code"]
+        SD["systems-dev"] --- SD_DIR["scripts/autoloads/<br/>scripts/systems/<br/>scripts/resources/<br/>addons/"]
+        GD["gameplay-dev"] --- GD_DIR["scenes/gameplay/<br/>scripts/entities/<br/>scripts/components/"]
+        UD["ui-dev"] --- UD_DIR["scenes/ui/<br/>scripts/ui/<br/>resources/themes/"]
+    end
+
+    subgraph CONTENT["Content & Assets"]
+        CA["content-architect"] --- CA_DIR["data/ all subdirs<br/>resources/*.tres"]
+        AA["asset-artist"] --- AA_DIR["assets/ all subdirs<br/>music/ sfx/ voice/"]
+    end
+
+    subgraph QUALITY["Quality"]
+        QA["qa-docs"] --- QA_DIR["docs/code-reviews/<br/>docs/systems-bible.md<br/>docs/architecture.md<br/>CHANGELOG.md"]
+    end
+```
+
+---
+
 ## Starting a New Project
 
 This workflow is deployed as a **GitHub template repository**. The `project-orchestrator` skill enforces the correct sequence automatically — you just need to follow its prompts.
@@ -11,17 +189,20 @@ This workflow is deployed as a **GitHub template repository**. The `project-orch
 ### Quick Start (2 steps)
 
 ```
-1. Open Claude Code       →  claude
-2. Say                    →  "Clone the Game-Template from https://github.com/cautiouskurns/Game-Template.git into this project directory, then run /project-bootstrap to set everything up."
+1. Open Claude Code in an empty directory  →  cd my-game && claude
+2. Say  →  "Clone the Game-Template from https://github.com/cautiouskurns/Game-Template.git into this directory, then run /project-bootstrap to set everything up."
 ```
 
-That's it. Claude will clone the template, bootstrap the project, and start the orchestrator — pausing for your approval at every gate. You can also run the steps manually if you prefer (see below).
+That's it. Claude will clone the template directly into the project root, bootstrap the project, and start the orchestrator — pausing for your approval at every gate. You can also run the steps manually if you prefer (see below).
+
+**IMPORTANT:** The template must be cloned **into the project root** (not into a subdirectory). The template's `.claude/` folder replaces any default `.claude/` that Claude Code created on startup. This ensures agents, skills, hooks, and settings are at the correct paths.
 
 ### Step-by-Step Walkthrough
 
 #### Step 1: Open Claude Code
 
 ```bash
+mkdir my-game && cd my-game
 claude
 ```
 
@@ -30,15 +211,16 @@ claude
 Ask Claude to create the project, or do it manually:
 
 ```bash
-# Option A: Ask Claude (recommended)                                                                
-# "Create a new game called my-game using the Game-Template"                                        
-# Claude runs: git clone, bootstrap, and orchestrator automatically                                 
-                                                                                                    
-# Option B: Manual                                                                                  
-git clone https://github.com/cautiouskurns/Game-Template.git my-game                                
-cd my-game
+# Option A: Ask Claude (recommended)
+# "Clone the Game-Template into this directory and run /project-bootstrap"
+# Claude runs: git clone into root, bootstrap, and orchestrator automatically
 
+# Option B: Manual
+git clone https://github.com/cautiouskurns/Game-Template.git .
 ```
+
+**Note:** If Claude Code has already created a `.claude/` directory in the project root, the clone will replace it with the template's `.claude/` (which contains agents, skills, hooks, and settings). This is intentional — the template's `.claude/` is the correct one.
+
 No GitHub CLI or authentication required — the template is a public repo.
 
 #### Step 3: Bootstrap (automatic if using Option A)
@@ -73,9 +255,10 @@ Step 0.3: design-bible-updater    → You approve design pillars and tone
 Step 0.3a: art-reference-collector    → You approve art direction and style anchors (optional)
 Step 0.3b: audio-reference-collector  → You approve audio direction and search anchors (optional)
 Step 0.3c: narrative-reference-collector → You approve narrative direction and templates (optional)
-Step 0.4: prototype-gdd-generator → You approve the Game Design Document
-Step 0.5: prototype-roadmap-planner → You approve the sprint breakdown
-Step 0.6: feature pipeline        → You approve each Sprint 1 feature spec
+Step 0.4: game-vision-generator   → You approve the Full Game Vision (complete game blueprint)
+Step 0.5: prototype-gdd-generator → You approve the Game Design Document (scoped from vision)
+Step 0.6: prototype-roadmap-planner → You approve the sprint breakdown
+Step 0.7: feature pipeline        → You approve each Sprint 1 feature spec
                                      ↓
                               Sprint 1 begins automatically
 ```
@@ -126,7 +309,7 @@ If the state file says you were awaiting approval on the GDD, it will re-present
 template-repo/
 ├── .claude/
 │   ├── agents/              ← 7 agent role definitions
-│   ├── skills/              ← 47 game development skills (including project-orchestrator)
+│   ├── skills/              ← 27 game development skills (including project-orchestrator)
 │   └── settings.local.json  ← MCP permissions (Ludo, Epidemic Sound, Figma, PixelLab)
 ├── docs/
 │   └── agent-team-workflow.md ← This document
@@ -280,7 +463,8 @@ Development progresses through three phases, each ending with a **user go/no-go 
 | Concept exploration | `game-concept-generator` | User selects concept direction |
 | Feasibility check | `concept-validator` | User reviews risks, decides to proceed |
 | Creative vision | `design-bible-updater` | User approves pillars and tone |
-| Design document | `prototype-gdd-generator` | User approves GDD before any coding |
+| Full game vision | `game-vision-generator` | User approves complete game blueprint and scope map |
+| Design document | `prototype-gdd-generator` | User approves GDD (scoped from vision) |
 | Roadmap | `roadmap-planner` | User approves sprint breakdown |
 | Sprint 1..N | Implementation sprints | User reviews each sprint (see Sprint Review below) |
 
@@ -297,7 +481,8 @@ User plays the prototype and decides:
 
 | Step | Skill | User Approval Point |
 |------|-------|-------------------|
-| Expand GDD | `vertical-slice-gdd-generator` | User approves expanded scope and quality targets |
+| Update game vision | `game-vision-generator` | User approves vision updates based on prototype learnings |
+| Expand GDD | `vertical-slice-gdd-generator` | User approves expanded scope and quality targets (scoped from vision) |
 | Expanded roadmap | `roadmap-planner` | User approves new sprint breakdown |
 | Sprint 1..N | Implementation sprints with polish focus | User reviews each sprint |
 
@@ -315,7 +500,8 @@ User plays the vertical slice and decides:
 
 | Step | Skill | User Approval Point |
 |------|-------|-------------------|
-| Full GDD | `production-gdd-generator` | User approves full game scope |
+| Update game vision | `game-vision-generator` | User approves vision updates based on VS learnings |
+| Full GDD | `production-gdd-generator` | User approves full game scope (scoped from vision) |
 | Production roadmap | `roadmap-planner` | User approves phased rollout |
 | Sprint 1..N | Full implementation sprints | User reviews each sprint |
 | Content complete | All content skills | User approves content lock |
@@ -334,6 +520,7 @@ User plays the vertical slice and decides:
 | Concept approval | After `game-concept-generator` | Which concept direction to pursue | Select, modify, or regenerate |
 | Feasibility review | After `concept-validator` | Whether risks are acceptable | Proceed, adjust scope, or abandon |
 | Design bible approval | After `design-bible-updater` | Whether pillars and tone are right | Approve, revise pillars, or restart |
+| Game vision approval | After `game-vision-generator` | Whether the complete game blueprint is right | Approve, adjust scope/mechanics, or restart |
 | GDD approval | After GDD generator | Whether the design is what you want | Approve, request changes, or restart |
 | Roadmap approval | After `roadmap-planner` | Whether the sprint breakdown makes sense | Approve, reorder, add/remove sprints |
 | Prototype go/no-go | After prototype sprints complete | Whether to proceed to vertical slice | Go, pivot, or kill |
@@ -402,7 +589,7 @@ When an agent reaches a control point, they **stop and present you with**:
 | `concept-validator` | Stress-testing feasibility of game concepts and features |
 | `game-concept-generator` | Initial ideation and concept exploration |
 | `game-ideator` | Deep creative foundation and inspiration when exploring new directions |
-| `narrative-architect` | Story and character foundations that inform content-architect's data files |
+| `game-vision-generator` | Creating the Full Game Vision — complete game blueprint with scope map |
 | `art-reference-collector` | Collating visual references and establishing art direction for asset generation |
 | `audio-reference-collector` | Collating audio references and establishing search anchors for Epidemic Sound |
 | `narrative-reference-collector` | Analyzing narrative style and creating templates for dialogue, lore, and worldbuilding |
@@ -540,40 +727,26 @@ Tool need → tool-spec-generator → Tool Spec (docs/tools/)
 ---
 
 ### content-architect
-**Purpose:** Creates all game content as structured data files. Characters, quests, dialogue, encounters, and world definitions. Owns the campaign-level view that ties content together. Also creates Godot Resource files (`.tres`) for game data when the project uses Godot's resource system instead of JSON.
+**Purpose:** Creates all game content as structured data files. Owns the data layer — enemy definitions, level configs, item tables, progression curves, spawn patterns, and any other data the game's systems consume. Also creates Godot Resource files (`.tres`) for game data when the project uses Godot's resource system instead of JSON.
 
 **Owned Directories:**
-- `data/characters/`
-- `data/quests/`
-- `data/dialogue/`
-- `data/encounters/`
-- `data/campaigns/`
-- `data/world/`
-- `data/items/`
-- `resources/cards/` (if the game uses card data resources)
-- `resources/enemies/` (if the game uses enemy data resources)
-- `resources/relics/` (if the game uses relic data resources)
-- `resources/potions/` (if the game uses potion data resources)
-- `resources/events/` (if the game uses event data resources)
-- `resources/characters/` (if the game uses character data resources)
+- `data/` (all subdirectories — structured game data as JSON)
+- `resources/` (`.tres` data instances that define game content)
 
-**Note:** The `resources/` subdirectories above are for **data-driven content** (`.tres` files that define game content like cards, enemies, items). The Resource **class definitions** (`.gd` scripts in `scripts/resources/`) remain owned by systems-dev. content-architect creates the `.tres` instances; systems-dev creates the `.gd` schemas.
+**Note:** The `resources/` subdirectories are for **data-driven content** (`.tres` files). The Resource **class definitions** (`.gd` scripts in `scripts/resources/`) remain owned by systems-dev. content-architect creates the `.tres` instances; systems-dev creates the `.gd` schemas.
+
+**Data directory structure** is defined per-project based on genre:
+```
+# Examples:
+data/levels/       data/enemies/      data/powerups/
+data/waves/        data/config/       data/progression/
+data/puzzles/      data/units/        data/maps/
+```
 
 **Skills:**
 | Skill | When Used |
 |-------|-----------|
-| `character-creator` | Defining NPCs, companions, enemies as structured data |
-| `world-builder` | Creating worldmap files with locations and connections |
-| `dialogue-designer` | Writing dialogue trees for NPCs |
-| `quest-designer` | Designing quest definitions with objectives and rewards |
-| `encounter-designer` | Creating combat encounter configurations |
-| `campaign-creator` | Tying all content together into playable campaigns |
-| `lore-generator` | Creating world lore, history, and background narrative |
-
-**Workflow Pattern:** Uses `campaign-creator` iteratively:
-1. MINIMAL mode - create campaign skeleton early
-2. UPDATE mode - add content as other data files are created
-3. FINALIZE mode - validate all cross-references before milestone
+| `data-refactor` | Analyzing code for hardcoded values to extract into data files |
 
 **Never Touches:** Code files, scene files, UI, autoloads, design docs.
 
@@ -705,6 +878,55 @@ project-root/
 
 Each sprint delivers a **playable vertical slice increment** — a small but complete piece of the game that can be tested.
 
+### Sprint Scoping
+
+Sprints must be small enough that the user sees regular progress. **Scope by feature count:**
+
+| Lifecycle Phase | Max Features Per Sprint | Typical Duration |
+|----------------|------------------------|------------------|
+| Prototype | 1-2 features | Short |
+| Vertical Slice | 2-3 features | Medium |
+| Production | 2-4 features | Medium-Long |
+
+**Scoping rules:**
+- Each feature maps to exactly one approved spec in `docs/features/`
+- If a feature requires more than 3 new systems, it's too big — split it into separate specs
+- If the sprint has more features than the max, split into multiple sprints
+- "Polish pass" and "bug fix" sprints can have more items since they're small changes, not new features
+
+**When in doubt, scope smaller.** Two focused sprints are better than one overloaded sprint.
+
+### Per-Feature Progress Reports
+
+**After each feature is completed in Phase B**, the implementing agent presents a **Feature Completion Report** to the user. This keeps the user informed during the sprint without blocking progress.
+
+**The team lead must present each report to the user as it comes in.** The sprint continues — this is not an approval gate — but the user can interrupt if something is clearly wrong.
+
+#### Feature Completion Report Format
+
+```
+## Feature Complete: [Feature Name]
+
+### What Was Built
+[2-3 sentences: what this feature does and why, referencing the spec]
+
+### What's Different Now
+[Bullet list: concrete, visible changes the user will see when they run the game]
+- [New UI element / new behavior / new interaction]
+- [Changed behavior from before]
+
+### How to Playtest
+1. [Open Godot / press F5]
+2. [Specific action to take]
+3. [What to look for]
+4. Success: [what confirms it works]
+
+### Known Limitations
+- [Anything not yet wired up, placeholder art, etc.]
+```
+
+**This is NOT Phase D review** — it's a progress update. The user does not need to respond. Phase D is when the user formally tests everything integrated together.
+
 ### Sprint Phases
 
 ```
@@ -724,8 +946,10 @@ Phase A: Spec & Foundation (systems-dev + design-lead)
 Phase B: Implementation (gameplay-dev + ui-dev + content-architect)
 ├── TEAM LEAD presents Phase B plan in chat (what agents will do)
 ├── TEAM LEAD spawns Phase B agents with team_name
-├── gameplay-dev reads specs, implements gameplay features (feature-implementer)
-├── ui-dev reads specs, implements UI features (feature-implementer)
+├── FOR EACH FEATURE:
+│     ├── Implementing agent reads spec, implements feature (feature-implementer)
+│     ├── Agent produces implementation report
+│     └── TEAM LEAD presents Feature Completion Report to user (non-blocking)
 ├── content-architect creates data files
 ├── asset-artist continues generating assets (parallel)
 ├── TEAM LEAD shuts down Phase B agents when complete
@@ -1483,50 +1707,116 @@ Avoid broadcasting. Default to direct messages to the specific agent who can hel
 
 ---
 
-## Deliverable Slice Roadmap Template
+## Epics
 
-Sprints are organized around **playable increments**, not systems. Each sprint produces something testable.
+Epics group related sprints into a coherent player-facing goal. They sit between the lifecycle level and individual sprints in the hierarchy:
 
 ```
-Sprint 1: "[Player can X]"
-  ├── Feature Specs: [list from design-lead]
-  ├── Systems Needed: [autoloads/managers from systems-dev]
-  ├── Gameplay Work: [scenes/entities from gameplay-dev]
-  ├── UI Work: [screens/HUD elements from ui-dev]
-  ├── Content Needed: [data files from content-architect]
-  ├── Assets Needed: [sprites/audio from asset-artist]
-  ├── Acceptance Criteria: [from feature spec]
-  └── 🔒 USER REVIEW: playtest, approve/reject features, approve next sprint
+Lifecycle Phase (Prototype / Vertical Slice / Production)
+  └── Epic: "[Player-facing goal]"
+        ├── Sprint 1: "[Playable increment]" (1-2 features)
+        ├── Sprint 2: "[Playable increment]" (1-2 features)
+        └── EPIC REVIEW: Did we achieve the goal?
+```
 
-Sprint 2: "[Player can Y]"
-  ...
+### Epic Rules
 
-[LIFECYCLE GATE after final sprint in phase]
+- Each epic has a clear **player-facing goal** (e.g., "Core Movement & Combat", "Level Progression")
+- An epic contains **2-4 sprints** — enough to achieve the goal, small enough to review
+- Every epic ends with an **Epic Review** where the user assesses progress toward the goal
+- Epics map to lifecycle phases but are more granular — a lifecycle phase may have 1-3 epics
+- The **roadmap planner** defines epics during Phase 0; the orchestrator tracks them in the state file
+
+### Epic Sizing by Lifecycle
+
+| Lifecycle Phase | Epics | Sprints per Epic | Focus |
+|----------------|-------|-----------------|-------|
+| Prototype | 1-2 | 1-2 | Prove core loop works |
+| Vertical Slice | 1-3 | 2-3 | Prove quality bar |
+| Production | 2-5+ | 2-4 | Build the full game |
+
+### Epic Review
+
+When all sprints in an epic are complete, the orchestrator presents an **Epic Review** before starting the next epic:
+
+```
+## Epic Review: "[Epic Goal]"
+
+### Goal Assessment
+- Epic goal: [What we set out to achieve]
+- Achieved: [YES / PARTIAL / NO]
+- Evidence: [What the user can now do in-game that proves it]
+
+### Sprints Completed
+- Sprint N: "[deliverable]" — [accepted / partially accepted]
+- Sprint N+1: "[deliverable]" — [accepted / partially accepted]
+
+### Lessons Learned
+- [What worked well]
+- [What to improve for next epic]
+
+### Next Epic Preview
+- Epic: "[Next goal]"
+- Sprints planned: [count]
+- First sprint: "[deliverable]"
+```
+
+The user decides: **proceed to next epic**, **iterate on this epic** (add a fix sprint), or **pause to reassess direction**.
+
+---
+
+## Deliverable Slice Roadmap Template
+
+Sprints are organized into **epics** around **player-facing goals**, not systems. Each sprint within an epic produces something testable.
+
+```
+Epic 1: "[Player-facing goal]"
+  │
+  ├── Sprint 1: "[Player can X]"
+  │     ├── Feature Specs: [list from design-lead]
+  │     ├── Systems Needed: [autoloads/managers from systems-dev]
+  │     ├── Gameplay Work: [scenes/entities from gameplay-dev]
+  │     ├── UI Work: [screens/HUD elements from ui-dev]
+  │     ├── Content Needed: [data files from content-architect]
+  │     ├── Assets Needed: [sprites/audio from asset-artist]
+  │     ├── Acceptance Criteria: [from feature spec]
+  │     └── 🔒 USER REVIEW: playtest, approve/reject features
+  │
+  ├── Sprint 2: "[Player can Y]"
+  │     └── ...
+  │
+  └── EPIC REVIEW: Did we achieve "[Player-facing goal]"?
+
+[LIFECYCLE GATE after final epic in phase]
   └── 🚦 GO/NO-GO: User decides whether to advance to next lifecycle phase
 ```
 
-### Example Roadmap (RPG)
+### Example Roadmap (Action Platformer)
 
 **PROTOTYPE PHASE** (prove the core loop is fun)
 
 ```
-Sprint 1: "Player can move through a world"
-  ├── Systems: InputManager, GameState, SceneManager
-  ├── Gameplay: PlayerController, Camera, TileMap scene
-  ├── UI: Debug overlay, FPS counter
-  ├── Content: First worldmap, starting location
-  ├── Assets: Player sprite + walk animation, first tileset, ambient music
-  ├── Criteria: Player moves with WASD, camera follows, world renders
-  └── 🔒 USER REVIEW: Does movement feel good? Is the world readable?
+Epic 1: "Core Movement & Combat"
 
-Sprint 2: "Player can encounter and fight an enemy"
-  ├── Systems: CombatManager, EventBus (damage signals)
-  ├── Gameplay: EnemyEntity, HitboxComponent, combat scene
-  ├── UI: Health bar, damage numbers, combat log
-  ├── Content: First enemy definition, test encounter
-  ├── Assets: Enemy sprite + attack animation, combat SFX, battle music
-  ├── Criteria: Player enters combat, can attack, enemy dies or player dies
-  └── 🔒 USER REVIEW: Is combat satisfying? Does the core loop work?
+  Sprint 1: "Player can move and jump through a level"
+    ├── Systems: InputManager, GameState, SceneManager
+    ├── Gameplay: PlayerController, Camera, TileMap scene
+    ├── UI: Debug overlay, FPS counter
+    ├── Content: First level layout data
+    ├── Assets: Player sprite + animations, first tileset, ambient music
+    ├── Criteria: Player moves with WASD, jumps, camera follows, level renders
+    └── 🔒 USER REVIEW: Does movement feel good? Is the level readable?
+
+  Sprint 2: "Player can fight enemies and die"
+    ├── Systems: EventBus (damage signals), SpawnManager
+    ├── Gameplay: EnemyEntity, HitboxComponent, combat mechanics
+    ├── UI: Health bar, damage numbers, death screen
+    ├── Content: First enemy definition, spawn wave data
+    ├── Assets: Enemy sprite + attack animation, combat SFX
+    ├── Criteria: Enemies spawn, player can attack, player/enemy can die
+    └── 🔒 USER REVIEW: Is combat satisfying? Does the core loop work?
+
+  EPIC REVIEW: Does the core loop (move + fight) feel fun?
 
 🚦 PROTOTYPE GO/NO-GO: Is the core loop fun enough to invest in polish?
 ```
@@ -1534,32 +1824,31 @@ Sprint 2: "Player can encounter and fight an enemy"
 **VERTICAL SLICE PHASE** (prove the quality bar)
 
 ```
-Sprint 3: "Player can talk to an NPC and receive a quest"
-  ├── Systems: DialogueManager, QuestTracker
-  ├── Gameplay: NPCEntity, interaction zones
-  ├── UI: Dialogue box, quest journal, notification toast
-  ├── Content: First NPC, dialogue tree, starter quest
-  ├── Assets: NPC sprite (polished), UI sounds, dialogue blips
-  ├── Criteria: Player talks to NPC, receives quest, quest appears in journal
-  └── 🔒 USER REVIEW: Does dialogue feel natural? Is quest tracking clear?
+Epic 2: "Level Progression"
 
-Sprint 4: "Player can complete a quest and be rewarded"
-  ├── Systems: InventoryManager, RewardSystem
-  ├── Gameplay: ItemPickup, quest objective triggers
-  ├── UI: Inventory screen, reward popup, quest complete notification
-  ├── Content: Quest completion data, reward items, updated campaign
-  ├── Assets: Item sprites (polished), reward fanfare SFX, chest animation
-  ├── Criteria: Player completes objective, returns to NPC, receives reward
-  └── 🔒 USER REVIEW: Does the full loop (explore → fight → talk → quest → reward) feel complete?
+  Sprint 3: "Player can progress through multiple levels"
+    ├── Systems: LevelManager, ProgressionTracker
+    ├── Gameplay: Level transitions, checkpoints, new enemy types
+    ├── UI: Level select, progress indicator, score display
+    ├── Content: 3 level configs, enemy variety data, difficulty curve
+    ├── Assets: New tilesets (polished), UI sounds, level-complete fanfare
+    ├── Criteria: Player completes level, unlocks next, difficulty increases
+    └── 🔒 USER REVIEW: Does progression feel rewarding? Is difficulty fair?
 
-Sprint 5: "Polish pass on the complete slice"
-  ├── Systems: Performance optimization, bug fixes
-  ├── Gameplay: Tuning, game feel, juice
-  ├── UI: Visual polish, transitions, feedback
-  ├── Content: Balance pass on all data
-  ├── Assets: Final art quality, audio mix, VFX polish
-  ├── Criteria: Slice represents target quality for full game
-  └── 🔒 USER REVIEW: Does this represent the game you want to build?
+  EPIC REVIEW: Does the progression loop work?
+
+Epic 3: "Visual & Audio Polish"
+
+  Sprint 4: "Polish pass on the complete slice"
+    ├── Systems: Performance optimization, bug fixes
+    ├── Gameplay: Tuning, game feel, juice (screen shake, particles)
+    ├── UI: Visual polish, transitions, feedback
+    ├── Content: Balance pass on all data
+    ├── Assets: Final art quality, audio mix, VFX polish
+    ├── Criteria: Slice represents target quality for full game
+    └── 🔒 USER REVIEW: Does this represent the game you want to build?
+
+  EPIC REVIEW: Does the slice meet the quality bar?
 
 🚦 VERTICAL SLICE GO/NO-GO: Is quality bar met? Proceed to full production?
 ```
@@ -1567,11 +1856,15 @@ Sprint 5: "Polish pass on the complete slice"
 **PRODUCTION PHASE** (build the full game)
 
 ```
-Sprint 6+: Expand from the validated vertical slice...
-  ├── New content, new systems, new areas
-  ├── Each sprint follows the same Phase A-D structure
-  ├── Each sprint ends with USER REVIEW
-  └── Scope informed by what was proven in the vertical slice
+Epic 4+: "[Player-facing goal for this epic]"
+
+  Sprint 5+: Expand from the validated vertical slice...
+    ├── New content, new systems, new areas
+    ├── Each sprint follows the same Phase A-D structure
+    ├── Each sprint ends with USER REVIEW
+    └── Scope informed by what was proven in the vertical slice
+
+  EPIC REVIEW after every 2-4 sprints
 ```
 
 ---
@@ -1599,16 +1892,19 @@ Before sprints begin, design-lead runs the design pipeline. **Every step pauses 
 3c. narrative-reference-collector → Analyze narrative style, create templates (optional)
    🔒 USER APPROVES narrative direction and templates
 
-4. prototype-gdd-generator     → Create the GDD through Q&A WITH USER
+4. game-vision-generator       → Map out the COMPLETE game (all mechanics, content, progression)
+   🔒 USER APPROVES full game vision and scope map
+
+5. prototype-gdd-generator     → Create the Prototype GDD (scoped from vision)
    🔒 USER APPROVES final GDD
 
-5. roadmap-planner             → Break GDD into deliverable slices
+6. roadmap-planner             → Break GDD into deliverable slices
    🔒 USER APPROVES sprint breakdown, can reorder/add/remove
 
-6. feature-idea-designer       → Refine Sprint 1 features into Idea Briefs
+7. feature-idea-designer       → Refine Sprint 1 features into Idea Briefs
    🔒 USER REVIEWS each idea brief for alignment with vision
 
-7. feature-spec-generator      → Convert Idea Briefs into full Feature Specs
+8. feature-spec-generator      → Convert Idea Briefs into full Feature Specs
    🔒 USER APPROVES specs before any implementation begins
 ```
 
@@ -1685,130 +1981,145 @@ When polish matters and asset volume increases, split asset-artist into two:
 
 ### Production Phase (8 agents)
 
-Same as vertical slice. Consider whether content-architect needs help if content volume is very high — but don't split due to campaign-creator's cross-reference requirements.
+Same as vertical slice. Consider whether content-architect needs help if content volume is very high.
 
 ---
 
-## Skill Genre Compatibility
+## Skill Reference
 
-**Important:** Many skills in this template were originally designed for a CRPG editor project. Not all are suitable for every game genre. Before starting a new project, review which skills apply.
+All skills in this template are genre-agnostic and work for any game type.
 
-### Fully Generic (any game genre)
+### Skills by Agent
 
-These skills work for platformers, puzzles, shooters, RPGs, strategy — anything:
-
-| Skill | Used By | Notes |
-|-------|---------|-------|
+| Skill | Used By | Purpose |
+|-------|---------|---------|
 | `concept-validator` | design-lead | Genre-agnostic feasibility testing |
-| `game-concept-generator` | design-lead | Explicitly supports all genres |
-| `design-bible-updater` | design-lead | Universal design pillars framework |
-| `prototype-gdd-generator` | design-lead | Process-focused, genre-neutral |
-| `vertical-slice-gdd-generator` | design-lead | Generic process, slight action bias in examples |
-| `feature-spec-generator` | design-lead | Template is generic, examples lean action |
-| `feature-idea-designer` | design-lead | Framework generic, examples lean RPG |
-| `feature-implementer` | all dev agents | Godot-generic, examples lean RPG |
-| `gdscript-quality-checker` | qa-docs | Language-level analysis, fully generic |
-| `gdscript-refactor-executor` | dev agents | Code refactoring, fully generic |
-| `data-driven-refactor` | qa-docs | Code analysis, fully generic |
-| `data-extractor` | qa-docs | Data extraction, fully generic |
-| `scene-optimizer` | gameplay-dev, ui-dev | Godot scene analysis, fully generic |
-| `vfx-generator` | gameplay-dev | Procedural particles, any genre |
-| `error-debugger` | dev agents | Debugging, fully generic |
-| `systems-bible-updater` | qa-docs | Technical docs, fully generic |
-| `architecture-documenter` | qa-docs | Structure docs, fully generic |
-| `system-diagram-generator` | qa-docs | Diagrams, fully generic |
-| `changelog-updater` | qa-docs | Changelog, fully generic |
-| `version-control-helper` | qa-docs | Git workflows, fully generic |
-| `tool-spec-generator` | design-lead | Tool specs, fully generic |
-| `tool-roadmap-planner` | design-lead | Tool planning, fully generic |
-| `tool-feature-implementer` | systems-dev | Tool building, fully generic |
+| `game-concept-generator` | design-lead | Concept exploration, supports all genres |
+| `design-bible-updater` | design-lead | Design pillars, vision, creative direction |
+| `prototype-gdd-generator` | design-lead | GDD creation through interactive Q&A |
+| `vertical-slice-gdd-generator` | design-lead | Expanding prototype GDD into vertical slice scope |
+| `feature-spec-generator` | design-lead | Detailed feature specs with acceptance criteria |
+| `feature-idea-designer` | design-lead | Refining vague ideas into structured briefs |
+| `game-ideator` | design-lead | Deep creative foundation and inspiration |
+| `art-reference-collector` | design-lead | Visual references and art direction |
+| `audio-reference-collector` | design-lead | Audio references and search anchors |
+| `narrative-reference-collector` | design-lead | Narrative style analysis and templates |
+| `tool-spec-generator` | design-lead | Specs for dev tools and editor plugins |
+| `tool-roadmap-planner` | design-lead | Phased implementation plans for tools |
+| `feature-implementer` | all dev agents | Implement features from specs |
+| `tool-feature-implementer` | systems-dev | Build tools from tool specs |
+| `error-debugger` | dev agents | Debug errors with deep analysis |
+| `scene-optimizer` | gameplay-dev, ui-dev | Scene structure and performance analysis |
+| `vfx-generator` | gameplay-dev | Procedural particle effects |
+| `code-reviewer` | qa-docs | GDScript quality and anti-pattern analysis |
+| `data-refactor` | qa-docs, content-architect | Extract hardcoded values into data files |
+| `systems-bible-updater` | qa-docs | Technical system documentation |
+| `architecture-documenter` | qa-docs | Project structure documentation |
+| `system-diagram-generator` | qa-docs | Mermaid/ASCII system diagrams |
+| `changelog-updater` | qa-docs | Development changelog |
+| `version-control-helper` | qa-docs | Git workflow guidance |
 
-### RPG/Narrative Content Pipeline (RPG and narrative games only)
+### Content-Architect Data Patterns
 
-These skills assume quest-based progression, NPC dialogue, D&D-style stats, and campaign structures. **Skip these entirely for non-narrative games:**
-
-| Skill | Used By | Genre Limitation |
-|-------|---------|-----------------|
-| `campaign-creator` | content-architect | CRPG-specific: quest chains, chapters, NPC recruitment |
-| `character-creator` | content-architect | CRPG-specific: D&D stats (STR/DEX/CON), companion tiers |
-| `quest-designer` | content-architect | CRPG-specific: quest types, "talk_to_npc" objectives |
-| `dialogue-designer` | content-architect | CRPG-specific: dialogue trees, Persuasion/Intimidation checks |
-| `encounter-designer` | content-architect | CRPG-specific: D&D CR difficulty, combat encounters |
-| `narrative-architect` | design-lead | RPG-biased: quest hooks, companion arcs |
-| `lore-generator` | content-architect | Mostly generic but examples assume fantasy RPG |
-| `world-builder` | content-architect | RPG-biased: settlements, services (shop/inn/blacksmith) |
-| `game-ideator` | design-lead | RPG-biased: D&D module import, tabletop conversion |
-| `production-gdd-generator` | design-lead | CRPG/live-service: economy, monetization, meta-progression |
-
-### Impact on Team by Genre
-
-| Game Genre | content-architect | design-lead changes | Notes |
-|-----------|------------------|-------------------|-------|
-| **CRPG / RPG** | Full role, all skills | Add `narrative-architect`, `game-ideator` | All skills apply |
-| **Action / Roguelike** | Partial — use for enemy data, level configs | Drop `campaign-creator`, `dialogue-designer` | Encounters may apply, quests likely don't |
-| **Platformer** | Minimal — level data, enemy configs | Drop all RPG content skills | content-architect creates JSON level/enemy definitions |
-| **Puzzle** | Minimal — puzzle configs, level data | Drop all RPG content skills | content-architect creates puzzle definition files |
-| **Strategy** | Partial — `world-builder` may apply | Drop quest/dialogue skills | Location system adaptable to strategy maps |
-| **Narrative / Visual Novel** | Partial — dialogue + characters apply | Keep `narrative-architect` | Skip encounters, quests may not apply |
-
-### Adapting for Non-RPG Games
-
-For non-RPG genres, content-architect still creates data files but uses **generic JSON schemas** instead of the CRPG-specific skills:
+content-architect creates structured data files (`data/` as JSON, `resources/` as `.tres`). The directory structure is defined per-project based on genre:
 
 ```
-Platformer content-architect might create:
-  data/levels/level_01.json          (layout, spawn points, collectibles)
-  data/enemies/goomba.json           (behavior, speed, damage)
-  data/powerups/double_jump.json     (duration, effect)
+Action / Platformer:
+  data/levels/       data/enemies/      data/powerups/      data/waves/
 
-Puzzle content-architect might create:
-  data/puzzles/chapter_1/puzzle_01.json  (grid size, rules, solution)
-  data/difficulty/curve.json              (progression tuning)
+Puzzle:
+  data/puzzles/      data/difficulty/    data/config/
 
-Tower Defense content-architect might create:
-  data/towers/archer_tower.json      (range, damage, cost, upgrades)
-  data/waves/wave_01.json            (enemy types, spawn timing, paths)
-  data/maps/forest_map.json          (paths, tower slots)
+Strategy / Tower Defense:
+  data/units/        data/maps/         data/waves/         data/upgrades/
+
+Any game:
+  data/config/       data/progression/   data/balance/
 ```
-
-The directory ownership (`data/`) and the role (structured game data) remain the same — only the skills and schemas change.
 
 ### Skill Audit Log
 
-**Audit date:** 2026-02-07
+**Last audit:** 2026-02-19
 
 #### Removed Skills
 
 | Skill | Reason |
 |-------|--------|
+| `campaign-creator` | CRPG-specific — removed in genre-neutrality cleanup |
+| `character-creator` | CRPG-specific — removed in genre-neutrality cleanup |
+| `quest-designer` | CRPG-specific — removed in genre-neutrality cleanup |
+| `dialogue-designer` | CRPG-specific — removed in genre-neutrality cleanup |
+| `encounter-designer` | CRPG-specific — removed in genre-neutrality cleanup |
+| `narrative-architect` | RPG-specific — removed in genre-neutrality cleanup |
+| `lore-generator` | RPG-specific — removed in genre-neutrality cleanup |
+| `world-builder` | RPG-specific — removed in genre-neutrality cleanup |
+| `test-campaign-generator` | CRPG-specific — removed in genre-neutrality cleanup |
+| `test-campaign-scaffolder` | CRPG-specific — removed in genre-neutrality cleanup |
 | `figma-prompt-generator` | Redundant — built-in Figma MCP `implement-design` skill handles this |
 | `figma-visual-updater` | Redundant — built-in Figma MCP `implement-design` skill handles this |
 | `godot-project-setup` | Superseded by `project-bootstrap` skill |
-| `PIXELART_PIPELINE_CONTEXT.md` | Documentation file, not a skill; CRPG-engine-specific |
+| `PIXELART_PIPELINE_CONTEXT.md` | Documentation file, not a skill |
 
 #### Conformance Updates
 
-All remaining skills now include a **Workflow Context** header specifying:
+All remaining skills include a **Workflow Context** header specifying:
 - Agent assignment (which agent uses the skill)
 - Sprint phase (when in the workflow the skill is invoked)
 - Directory scope (what directories the skill operates on)
 - Workflow reference (link to this document)
 
-RPG-pipeline skills additionally include a **genre warning banner** clearly marking them as CRPG-specific with guidance on what to use instead for non-RPG games.
-
 #### Future Revisions (Nice-to-Have)
-
-These generic skills would benefit from diversified examples but work fine as-is:
 
 | Skill | Issue | Recommended Fix |
 |-------|-------|----------------|
-| `feature-implementer` | Examples assume combat/RPG systems | Diversify examples (add platformer, puzzle scenarios) |
-| `feature-idea-designer` | Examples reference inventory, economy, parts | Add non-RPG example flows |
-| `production-gdd-generator` | Assumes economy, monetization, live-ops | Make these sections conditional, not mandatory |
+| `feature-implementer` | Examples assume combat systems | Diversify examples (add platformer, puzzle scenarios) |
+| `feature-idea-designer` | Examples reference inventory, economy | Add non-RPG example flows |
 | `game-ideator` | D&D module import dominates | Add non-tabletop ideation modes |
-| `world-builder` | Location services hardcoded (shop/inn/blacksmith) | Make services configurable per genre |
 
-These revisions are not blocking — the generic skills work fine for any game. The RPG pipeline skills simply won't be invoked for non-RPG projects.
+---
+
+## Automated Enforcement (Hooks)
+
+The workflow uses Claude Code hooks (`.claude/hooks/`) to enforce rules and provide instrumentation. These run automatically — agents do not need to invoke them.
+
+### PreToolUse Hooks (block bad actions before they happen)
+
+| Hook | Fires On | What It Enforces |
+|------|----------|-----------------|
+| `enforce-feature-spec.sh` | Write (new `.gd` files) | Blocks new script creation if no feature specs exist in `docs/features/` |
+| `validate-phase-gate.sh` | Write (new `.gd`/`.tscn` files) | Blocks implementation during Phase 0 or Phase A (except foundation work by systems-dev). Validates that approved specs exist in state file. |
+
+### PostToolUse Hooks (validate and log after actions)
+
+| Hook | Fires On | What It Does | Sync/Async |
+|------|----------|-------------|------------|
+| `log-sprint-activity.sh` | Edit/Write | Logs every file change to `docs/sprint-logs/sprint-{N}-activity.log` | Async |
+| `sync-claude-md.sh` | Edit/Write | Updates CLAUDE.md when docs are created (removes "when it exists" markers, syncs lifecycle/sprint status from state file) | Async |
+| `log-phase-timing.sh` | Edit/Write | When state file changes, logs transition to `docs/sprint-logs/workflow-timing.jsonl` with timestamps for instrumentation | Async |
+| `validate-state-file.sh` | Edit/Write | When state file is modified, validates JSON structure, enum values, lifecycle/phase coherence, and sprint array integrity. **Blocks** invalid state writes. | Sync |
+| `capture-smoke-test.sh` | Bash | When `godot --headless --quit` runs, captures and parses output. Logs errors/warnings to `docs/sprint-logs/sprint-{N}-smoke-test.log` and writes a summary JSON. | Async |
+
+### Session Hooks
+
+| Hook | Fires On | What It Does |
+|------|----------|-------------|
+| `inject-sprint-context.sh` | Session start/resume | Reads state file and injects current workflow position as context |
+| `inject-subagent-context.sh` | Subagent spawn | Injects sprint info + directory ownership rules into spawned agents |
+| Stop prompt | Session end | Blocks session end if implementation work was done without a sprint progress summary |
+
+### Instrumentation
+
+Workflow timing data is logged to `docs/sprint-logs/workflow-timing.jsonl` (JSON Lines format). Each line is a state transition event:
+
+```json
+{"timestamp": "2026-02-19T12:00:00+00:00", "lifecycle": "prototype", "sprint": 1, "phase": "B", "status": "in_progress", "event": "transition"}
+```
+
+This enables post-sprint analysis of:
+- Phase durations (time between transition events)
+- Bottleneck identification (which phases take longest)
+- Gate wait times (time between "awaiting_user_approval" and "completed")
+- Sprint velocity trends across multiple sprints
 
 ---
 

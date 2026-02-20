@@ -1,6 +1,6 @@
 # Narrative Reference Collector
 
-Analyze a target game's narrative design — story structure, dialogue style, lore delivery, worldbuilding patterns — and produce a narrative direction document that guides the narrative-architect, lore-generator, dialogue-designer, and quest-designer skills.
+Analyze a target game's narrative design — story structure, dialogue style, lore delivery, worldbuilding patterns — and produce a narrative direction document that guides content creation and feature spec writing.
 
 ## Workflow Context
 
@@ -9,7 +9,7 @@ Analyze a target game's narrative design — story structure, dialogue style, lo
 | **Assigned Agent** | design-lead (or orchestrator during Phase 0) |
 | **Sprint Phase** | Phase 0 (after design bible, before/during GDD) |
 | **Directory Scope** | `docs/narrative-direction.md` |
-| **Downstream** | narrative-architect, lore-generator, dialogue-designer, quest-designer |
+| **Downstream** | design-lead (feature specs), content-architect (data files) |
 
 ## How to Invoke This Skill
 
@@ -326,35 +326,20 @@ Use AskUserQuestion:
 
 ---
 
-## Integration with Downstream Skills
+## Integration with Downstream Agents
 
-Once approved, the narrative direction feeds into all narrative-related skills:
+Once approved, the narrative direction feeds into feature specs and content creation:
 
-### narrative-architect
-- Reads `docs/narrative-direction.md` for story structure model, pacing guide, emotional targets
-- Uses the Story Structure section to plan arcs
-- Follows the Emotional Design Targets when defining key scenes
-
-### lore-generator
-- Reads the Lore Entry Pattern template for formatting
-- Follows the Worldbuilding Guide for naming conventions and history depth
-- Respects the mystery budget (what to explain vs leave ambiguous)
-- Uses the Lore Delivery Hierarchy to know which delivery methods to write for
-
-### dialogue-designer
-- Reads the Dialogue Voice Guide for vocabulary, tone, sentence length
-- Uses the NPC Dialogue Pattern template for structuring conversations
-- Follows Character Voice Differentiation guidelines
-- References the Dialogue Don'ts list
-
-### quest-designer
-- Uses the Environmental Storytelling Checklist per area
-- Follows the Pacing Guide for quest intensity distribution
-- References the Lore Delivery Hierarchy to embed narrative into quest design
+### design-lead
+- References `docs/narrative-direction.md` when writing feature specs that involve narrative elements
+- Uses the Story Structure section to inform pacing and emotional targets in specs
+- Includes narrative voice guidelines in specs that require text content
 
 ### content-architect
+- Reads the Dialogue Voice Guide for vocabulary, tone, sentence length in any text data
+- Uses naming conventions from Worldbuilding Guide for data file content
+- Follows the Lore Delivery Hierarchy to know how narrative is embedded in gameplay data
 - Uses the Item Description Pattern for all item/equipment/collectible text
-- Follows naming conventions from Worldbuilding Guide
 
 ## Integration with Feature Specs
 
