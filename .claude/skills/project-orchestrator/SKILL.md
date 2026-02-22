@@ -97,7 +97,12 @@ Create `docs/.workflow-state.json` with:
     "game_vision_generator": { "status": "pending", "artifact": null, "approved_at": null },
     "gdd_generator": { "status": "pending", "artifact": null, "approved_at": null },
     "roadmap_planner": { "status": "pending", "artifact": null, "approved_at": null },
-    "feature_pipeline": { "sprint_1_features": [] }
+    "feature_pipeline": {
+      "sprint_1_features": [],
+      "sprint_2_features": [],
+      "sprint_3_features": [],
+      "sprint_4_features": []
+    }
   },
   "epics": [],
   "sprints": [],
@@ -476,7 +481,15 @@ This step is iterative — it runs once per feature in Sprint 1.
    3. Save to `docs/features/[feature-name].md`
    4. Present to user for approval
 
-4. Track each feature's progress in `phase_0_progress.feature_pipeline.sprint_1_features`
+4. Track each feature's progress in `phase_0_progress.feature_pipeline.sprint_N_features` using this per-feature structure:
+   ```json
+   {
+     "name": "feature-name",
+     "idea_brief": { "status": "pending|skipped|completed", "artifact": null },
+     "feature_spec": { "status": "pending|completed", "artifact": "docs/features/feature-name.md", "approved_at": null }
+   }
+   ```
+   Populate entries for ALL sprints defined in the roadmap (not just Sprint 1). Future sprint features start with `"status": "pending"`.
 5. When ALL Sprint 1 features have approved specs → Phase 0 is complete
 
 **User Gate (per feature):**
@@ -542,7 +555,7 @@ When beginning a new sprint:
     If the epic already exists, append this sprint number to `sprint_numbers`.
 2. Create git branch: `git checkout -b sprint/[N]-[short-description]`
 3. Create team: `TeamCreate: team_name="sprint-[N]", description="Sprint [N]: [deliverable]"`
-4. Add sprint entry to state:
+4. Add sprint entry to state with **full detail** — including all tasks from the roadmap pre-populated:
    ```json
    {
      "sprint_number": N,
@@ -552,19 +565,45 @@ When beginning a new sprint:
      "lifecycle_phase": "[current lifecycle phase]",
      "current_phase": "A",
      "team_name": "sprint-N",
+     "godot_path": null,
      "phases": {
-       "A": { "status": "pending", "agents": [] },
-       "B": { "status": "pending", "agents": [] },
-       "B5": { "status": "pending", "checklist": {} },
-       "C": { "status": "pending", "agents": [] },
-       "D": { "status": "pending" }
+       "A": { "status": "pending", "agents": [], "completed_at": null, "notes": null },
+       "B": { "status": "pending", "agents": [], "completed_at": null, "notes": null },
+       "B5": { "status": "pending", "checklist": {}, "issues_found": 0, "issues_fixed": 0, "smoke_test": null, "notes": null },
+       "C": { "status": "pending", "agents": [], "completed_at": null, "notes": null },
+       "D": { "status": "pending", "substep": null, "fix_loop": { "iterations": [] }, "approval": {} }
      },
-     "features": []
+     "features": ["feature-name-1", "feature-name-2"],
+     "tasks": []
    }
    ```
-5. Populate features from the roadmap/feature specs
-6. Write state file
-7. Transition to Phase A
+5. **Populate tasks from the roadmap** — read `docs/prototype-roadmap.md` (or equivalent) and create a task entry for EVERY task listed in this sprint, using this schema:
+   ```json
+   {
+     "id": "SYS-N.M",
+     "agent": "systems-dev|gameplay-dev|ui-dev|content-architect|asset-artist|team-lead",
+     "phase": "A|B|B5|C|D",
+     "feature": "feature-name or null for integration/bug tasks",
+     "description": "What this task does — one line",
+     "status": "pending|completed",
+     "files_created": [],
+     "files_modified": [],
+     "completed_at": null,
+     "notes": null
+   }
+   ```
+   Task ID prefixes: `SYS-` (systems-dev), `GP-` (gameplay-dev), `UI-` (ui-dev), `CON-` (content-architect), `ART-` (asset-artist), `TL-` (team-lead).
+   Include tasks for ALL phases (A, B, B5, C, D) that are defined in the roadmap.
+6. Populate features list from the roadmap/feature specs
+7. Write state file
+8. Transition to Phase A
+
+**IMPORTANT — Task Tracking During Sprint:**
+- When a task is completed: update its `status` to `"completed"`, fill in `files_created`, `files_modified`, `completed_at`, and `notes`
+- When Phase D fix loop iterations occur: add `TL-` tasks for each fix
+- When phases complete: update `completed_at` and `notes` on the phase entry
+- When B.5 integration runs: fill in `checklist`, `issues_found`, `issues_fixed`, `smoke_test`
+- When Phase D approval occurs: fill in the `approval` object with per-feature decisions
 
 ---
 
@@ -602,7 +641,9 @@ When beginning a new sprint:
    ```
 
 4. Create tasks via TaskCreate for each agent's work, with dependencies
-5. Record spawned agents in Phase A state
+5. Record spawned agents in Phase A state: `phases.A.agents = ["systems-dev", "asset-artist"]`
+
+**As tasks complete:** Update the corresponding task entry in `sprints[N].tasks` with `status: "completed"`, `files_created`, `files_modified`, `completed_at`, and `notes`.
 
 **Transition to Phase B when:**
 - All feature specs are approved by user
@@ -644,6 +685,8 @@ When beginning a new sprint:
 
 4. Keep asset-artist running from Phase A
 5. Create tasks via TaskCreate for each feature, with `addBlockedBy` for dependencies
+
+**As tasks complete:** Update the corresponding task entry in `sprints[N].tasks` with `status: "completed"`, `files_created`, `files_modified`, `completed_at`, and `notes`. When the phase finishes, update `phases.B.completed_at` and `phases.B.notes`.
 
 **Per-Feature Progress Reports:**
 
@@ -920,14 +963,18 @@ When the user reports issues (screenshots, text descriptions, bug reports):
 6. Update substep → `"user_testing"`
 7. **Repeat** as many times as needed — this loop has no iteration limit
 
-Track fix loop history in the sprint state:
+Track fix loop history in the sprint state, and add a corresponding `TL-` task for each fix:
 ```json
 "fix_loop": {
   "iterations": [
-    { "reported_by": "user", "issue": "Parser error: class_name hides autoload", "fix": "Removed class_name from autoload scripts", "smoke_test": "passed" },
-    { "reported_by": "user", "issue": "UI text too small at 1080p", "fix": "Increased theme font size and panel dimensions", "smoke_test": "passed" }
+    { "reported_by": "user", "issue": "Parser error: class_name hides autoload", "fix": "Removed class_name from autoload scripts", "smoke_test": "passed", "task_id": "TL-N.1" },
+    { "reported_by": "user", "issue": "UI text too small at 1080p", "fix": "Increased theme font size and panel dimensions", "smoke_test": "passed", "task_id": "TL-N.2" }
   ]
 }
+```
+Each fix loop iteration must also create a task entry in `sprints[N].tasks`:
+```json
+{ "id": "TL-N.M", "agent": "team-lead", "phase": "D", "feature": null, "description": "Fix: [issue summary]", "status": "completed", "files_created": [], "files_modified": ["affected files"], "completed_at": "[timestamp]", "notes": "[details]" }
 ```
 
 #### Step 4: Final Approval
@@ -958,6 +1005,16 @@ Options:
 - CONTINUE — Accept sprint results and move forward
 - PAUSE — Pause development (can resume later)
 - PIVOT — Significant direction change needed
+
+**Record approval decisions** in the sprint state:
+```json
+"approval": {
+  "feature-name-1": "accepted|request_changes|rejected",
+  "feature-name-2": "accepted|request_changes|rejected",
+  "next_sprint": "approved|modified|reordered",
+  "overall": "continue|pause|pivot"
+}
+```
 
 **On Continue (all features accepted):**
 1. Update Phase D status → `"completed"`, sprint `current_phase` → `"completed"`
