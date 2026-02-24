@@ -4,6 +4,12 @@ A structured approach to AI-assisted game development using coordinated agent te
 
 ---
 
+### Metadata Requirements
+
+All agents must maintain structured YAML frontmatter metadata in agent files and feature specs. This metadata is read by GameForge for project tracking and visualization. See the "GameForge Metadata Contract" section in CLAUDE.md for the complete specification.
+
+---
+
 ## Workflow Overview
 
 ### Development Lifecycle
@@ -1036,6 +1042,9 @@ The roadmap document (`docs/*-roadmap.md`) is a **living checklist**, not a stat
 - [x] ART-N.1: Generate [assets]
 
 ### Phase B — Implementation
+
+> When beginning implementation of a feature, update its YAML frontmatter `status` to `in-progress` and `updated` to today's date.
+
 - [x] GP-N.1: Implement [gameplay feature]
 - [x] UI-N.1: Build [UI element]
 - [x] CA-N.1: Create [data files]
@@ -1144,6 +1153,8 @@ The state file tracks each review loop iteration with mandatory fields for clean
 | `smoke_test` | `pass`, `fail`, `skipped` | Verify stability |
 
 **Key principle:** All user feedback during Phase D — whether bugs, adjustments, or additions — are **first-class workflow events**, not interruptions. The review loop exists precisely so the user can shape the delivered features before moving on.
+
+> After the user accepts the sprint, update all sprint features' YAML frontmatter: set `status: complete` and `updated:` to today's date.
 
 ### Sprint Review Format (Phase D)
 

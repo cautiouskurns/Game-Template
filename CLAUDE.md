@@ -22,6 +22,26 @@ This project uses a structured agent team with 7 roles: design-lead, systems-dev
 4. **Use `feature-implementer` for all implementation.** All three dev agents (systems-dev, gameplay-dev, ui-dev) use the `feature-implementer` skill to implement features from specs.
 5. **Quality reviews are mandatory.** qa-docs runs `gdscript-quality-checker` on all new code. Critical issues block the next sprint.
 
+## GameForge Metadata Contract
+
+This project maintains structured metadata for GameForge dashboard integration.
+
+**Agent files** (`.claude/agents/*.md`):
+- MUST have YAML frontmatter with `name:` and `role:` fields
+- The `role` value determines discipline mapping (Art/Audio/Design/Code/QA)
+- Role must contain a keyword: `artist`/`art` → Art, `audio`/`sound` → Audio, `designer`/`content` → Design, `developer`/`engineer` → Code, `qa`/`test`/`doc` → QA
+
+**Feature specs** (`docs/features/*.md`):
+- MUST use YAML frontmatter (not inline bold) with at minimum `status:` and `priority:`
+- Valid status: `not-started`, `in-progress`, `complete`, `blocked`
+- Valid priority: `high`, `medium`, `low`
+- Recommended: `epoch`, `sprint`, `dependencies`, `updated`
+- Update `status` at phase transitions: `not-started` → `in-progress` (Phase B) → `complete` (Phase D accepted)
+
+**Workflow state** (`docs/.workflow-state.json`):
+- Task entries with `agent` + `feature` fields are the source for agent-feature assignments
+- No special formatting needed — the existing task tracking format is correct
+
 ## Orchestrator Protocol
 
 This project uses the `project-orchestrator` skill to enforce the development workflow.
