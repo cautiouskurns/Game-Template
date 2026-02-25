@@ -149,6 +149,7 @@ All status updates, deliveries, and transitions MUST use the standardized report
 - Integration check reports
 - Document update logs
 - Fix loop reports
+- Playtest guides (Phase D, per sprint)
 
 **Rules:**
 - Never freeform a status update — always use the matching template
@@ -885,7 +886,8 @@ Track the current sub-state in `workflow_position.substep`:
 | Sub-State | Description |
 |-----------|-------------|
 | `smoke_test` | Running initial headless smoke test |
-| `presenting_review` | Compiling and presenting the sprint review |
+| `generating_playtest_guide` | Generating playtest guide from feature specs + sprint tasks |
+| `presenting_review` | Compiling and presenting the sprint review + playtest guide |
 | `user_testing` | User is playtesting, may report issues |
 | `fix_loop` | User reported issues, team lead is fixing |
 | `final_approval` | Fix loop complete, presenting formal approval gate |
@@ -899,9 +901,22 @@ Track the current sub-state in `workflow_position.substep`:
 5. Clear `team_name` in sprint state
 6. Run: `godot --headless --quit 2>&1`
 7. If errors → fix them, re-run until clean
-8. Update substep → `"presenting_review"`
+8. Update substep → `"generating_playtest_guide"`
 
-#### Step 2: Present Sprint Review
+#### Step 2: Generate Playtest Guide
+
+1. Update substep → `"generating_playtest_guide"` (if not already set)
+2. Gather context from these sources:
+   - **Feature specs** (`docs/features/{name}.md`) — what each feature does, acceptance criteria
+   - **Sprint tasks** (workflow state `sprints[N].tasks`) — what was actually built, files created/modified
+   - **`project.godot`** — `run/main_scene` for the entry point scene
+   - **Systems bible** (`docs/systems-bible.md`) — navigation flow between scenes (how to reach each feature)
+   - **Previous playtest guide** (`docs/sprint-logs/sprint-{N-1}-playtest-guide.md`, if exists) — for the "Cumulative Game State" section baseline
+3. Generate `docs/sprint-logs/sprint-{N}-playtest-guide.md` using the Playtest Guide template from `report-formats.md` (format #10)
+4. Update substep → `"presenting_review"`
+5. Present the playtest guide path alongside the sprint review in the next step
+
+#### Step 3: Present Sprint Review
 
 **Compile Sprint Review** using this format (from workflow doc):
 
@@ -947,11 +962,11 @@ For each feature:
 - [decisions needed]
 ```
 
-Present the review and tell the user: "Please playtest the build in Godot. Report any bugs or issues (screenshots welcome), or proceed to the formal approval when ready."
+Present the review and reference the playtest guide: "The playtest guide is at `docs/sprint-logs/sprint-{N}-playtest-guide.md` — it has step-by-step test instructions for each feature. Report any bugs or issues (screenshots welcome), or proceed to the formal approval when ready."
 
 Update substep → `"user_testing"`
 
-#### Step 3: Fix Loop
+#### Step 4: Fix Loop
 
 When the user reports issues (screenshots, text descriptions, bug reports):
 
@@ -977,7 +992,7 @@ Each fix loop iteration must also create a task entry in `sprints[N].tasks`:
 { "id": "TL-N.M", "agent": "team-lead", "phase": "D", "feature": null, "description": "Fix: [issue summary]", "status": "completed", "files_created": [], "files_modified": ["affected files"], "completed_at": "[timestamp]", "notes": "[details]" }
 ```
 
-#### Step 4: Final Approval
+#### Step 5: Final Approval
 
 When the user indicates they're satisfied (says "looks good", "ready to approve", or asks to proceed):
 
@@ -1220,8 +1235,9 @@ On every invocation, this skill reads the state file. Recovery logic:
 | `completed` | Proceed to next step |
 | Sprint with `team_name` set | Check if team exists; recreate if needed |
 | Phase D substep `smoke_test` | Re-run the headless smoke test |
-| Phase D substep `presenting_review` | Re-compile and present the sprint review |
-| Phase D substep `user_testing` | Remind user they were playtesting, ask for status |
+| Phase D substep `generating_playtest_guide` | Check if playtest guide file exists; if yes, advance to `presenting_review`; if no, regenerate it |
+| Phase D substep `presenting_review` | Re-compile and present the sprint review + reference playtest guide |
+| Phase D substep `user_testing` | Remind user they were playtesting, reference playtest guide, ask for status |
 | Phase D substep `fix_loop` | Show the last reported issue and ask if the fix is still needed |
 | Phase D substep `final_approval` | Re-present the formal approval gate |
 

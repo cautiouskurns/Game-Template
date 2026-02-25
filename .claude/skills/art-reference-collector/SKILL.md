@@ -239,6 +239,30 @@ image_type: "ui_asset"
 [Any additional observations about the art style, gotchas, or things to watch for]
 ```
 
+### Step 5.5: Generate Reference Manifest
+
+Update the structured reference manifest for GameForge dashboard integration.
+
+1. **Read or initialize** `docs/references/manifest.json`:
+   - If it exists, read it and parse the JSON
+   - If it doesn't exist, create it with: `{ "version": "1.0.0", "generated_at": "", "sources": [] }`
+
+2. **Populate the `art` section** with structured data extracted from `docs/art-direction.md`:
+   - `art.style_summary` — the Visual Style Summary paragraph
+   - `art.palettes` — Global Palette colors (hex, role, usage) + District-Specific Palettes (name, primary, secondary, accent, atmosphere)
+   - `art.style_anchors` — each style anchor with category, path, and description
+   - `art.prompt_templates` — each Ludo prompt template with name, style_anchor filename, prompt_pattern, and image_type
+
+3. **Preserve other sections untouched** — do NOT modify `audio` or `narrative` if they exist.
+
+4. **Update metadata**:
+   - Set `generated_at` to today's date
+   - Add `"docs/art-direction.md"` to `sources` (if not already present)
+
+5. **Write** the updated JSON back to `docs/references/manifest.json`.
+
+Create the `docs/references/` directory if it doesn't exist (`mkdir -p docs/references`).
+
 ### Step 6: Present to User for Approval
 
 Display a summary of:
@@ -298,4 +322,5 @@ If the art style evolves during development:
 assets/references/           — organized reference images
 assets/references/style_anchor_*.png  — primary style anchors for Ludo
 docs/art-direction.md        — full style guide with palette, proportions, prompts
+docs/references/manifest.json — GameForge reference manifest (art section)
 ```

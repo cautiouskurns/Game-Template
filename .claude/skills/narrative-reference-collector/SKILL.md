@@ -311,6 +311,34 @@ Methods explicitly NOT used: [list any methods the reference avoids and why]
 [Additional observations, edge cases, things to watch for]
 ```
 
+### Step 5.5: Generate Reference Manifest
+
+Update the structured reference manifest for GameForge dashboard integration.
+
+1. **Read or initialize** `docs/references/manifest.json`:
+   - If it exists, read it and parse the JSON
+   - If it doesn't exist, create it with: `{ "version": "1.0.0", "generated_at": "", "sources": [] }`
+
+2. **Populate the `narrative` section** with structured data extracted from `docs/narrative-direction.md`:
+   - `narrative.style_summary` — the Narrative Style Summary paragraph
+   - `narrative.voice_guide` — vocabulary, sentence_length, tone, and subtext_level from the Overall Voice section
+   - `narrative.character_voices` — each character with voice description and example_lines array
+   - `narrative.sample_lines.reference` — reference game example lines with text, source, and note
+   - `narrative.sample_lines.original` — adapted example lines with text and context
+   - `narrative.templates` — each downstream template with name, pattern, and example
+   - `narrative.emotional_targets` — each emotion with when and how
+   - `narrative.dialogue_donts` — list of dialogue rules to avoid
+
+3. **Preserve other sections untouched** — do NOT modify `art` or `audio` if they exist.
+
+4. **Update metadata**:
+   - Set `generated_at` to today's date
+   - Add `"docs/narrative-direction.md"` to `sources` (if not already present)
+
+5. **Write** the updated JSON back to `docs/references/manifest.json`.
+
+Create the `docs/references/` directory if it doesn't exist (`mkdir -p docs/references`).
+
 ### Step 6: Present to User for Approval
 
 Display a summary of:
@@ -359,4 +387,5 @@ Feature specs should reference the narrative direction:
 
 # Output:
 docs/narrative-direction.md  — full narrative guide with templates and voice examples
+docs/references/manifest.json — GameForge reference manifest (narrative section)
 ```

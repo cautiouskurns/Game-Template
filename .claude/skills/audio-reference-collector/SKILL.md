@@ -271,6 +271,31 @@ Create `docs/audio-direction.md` using this template:
 - **Volume balance:** [relative levels — music vs SFX vs voice]
 ```
 
+### Step 5.5: Generate Reference Manifest
+
+Update the structured reference manifest for GameForge dashboard integration.
+
+1. **Read or initialize** `docs/references/manifest.json`:
+   - If it exists, read it and parse the JSON
+   - If it doesn't exist, create it with: `{ "version": "1.0.0", "generated_at": "", "sources": [] }`
+
+2. **Populate the `audio` section** with structured data extracted from `docs/audio-direction.md`:
+   - `audio.style_summary` — the Audio Style Summary paragraph
+   - `audio.tracks` — each Key Epidemic Sound Track with title, artist, epidemic_sound_id, context, bpm, and tags array
+   - `audio.search_anchors.music` — each Music Search Anchor with context, search_term, mood_slugs, bpm_range, instruments, vocals, and best_match
+   - `audio.search_anchors.sfx` — each SFX Search Anchor with category, search_terms, and style_notes
+   - `audio.motifs` — each Musical Motif with name, usage, and description
+
+3. **Preserve other sections untouched** — do NOT modify `art` or `narrative` if they exist.
+
+4. **Update metadata**:
+   - Set `generated_at` to today's date
+   - Add `"docs/audio-direction.md"` to `sources` (if not already present)
+
+5. **Write** the updated JSON back to `docs/references/manifest.json`.
+
+Create the `docs/references/` directory if it doesn't exist (`mkdir -p docs/references`).
+
 ### Step 6: Present to User for Approval
 
 Display a summary of:
@@ -314,4 +339,5 @@ Feature specs should reference the audio direction when describing audio require
 
 # Output:
 docs/audio-direction.md    — full audio guide with search anchors and mood tables
+docs/references/manifest.json — GameForge reference manifest (audio section)
 ```

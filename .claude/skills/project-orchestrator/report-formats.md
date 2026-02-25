@@ -4,7 +4,7 @@ Reference document for all structured output the orchestrator and agents produce
 
 ---
 
-## Visual Hierarchy
+## Visual Hierarchy˜
 
 | Level | When | Style |
 |-------|------|-------|
@@ -297,6 +297,94 @@ Used during Phase D when the user reports issues and they're fixed.
 │  ▸ Ready for re-test                              │
 └───────────────────────────────────────────────────┘
 ```
+
+---
+
+## 10. Playtest Guide
+
+Used at Phase D of every sprint, generated after the smoke test passes and before the sprint review is presented. This is a standalone markdown file saved to `docs/sprint-logs/sprint-{N}-playtest-guide.md`.
+
+### YAML Frontmatter
+
+```yaml
+---
+type: playtest-guide
+sprint: {N}
+sprint_name: "{sprint deliverable name}"
+epic: "{epic name}"
+epic_number: {E}
+lifecycle_phase: {current lifecycle phase}
+generated_at: "{ISO 8601 timestamp}"
+features:
+  - {feature-slug-1}
+  - {feature-slug-2}
+smoke_test: passed
+entry_point: "{res:// path to main scene}"
+estimated_time: "{N-N minutes}"
+---
+```
+
+### Markdown Body
+
+```markdown
+# Sprint {N} Playtest Guide
+
+> {sprint_name}
+
+## Prerequisites
+- Build has passed headless smoke test
+- Launch the game from Godot editor (F5) or run the exported build
+- Game starts at: `{entry_point}`
+
+## Cumulative Game State
+{3-5 sentences: what the player can already do from previous sprints. Anchors
+the tester so they know the baseline before testing new features.}
+
+---
+
+## Feature: {Feature Name}
+
+### What It Does
+{1-2 sentences from the feature spec.}
+
+### How to Reach It
+1. {Step from game start to reach this feature}
+2. {Next navigation step}
+3. {You should now see X}
+
+### Test Actions
+1. **{Action name}** — {What to do}
+   - Expected: {What should happen}
+2. **{Action name}** — {What to do}
+   - Expected: {What should happen}
+
+### Success Criteria
+- [ ] {Observable result confirming the feature works}
+- [ ] {Another observable result}
+
+### Known Limitations
+- {Limitation or edge case the tester should be aware of}
+
+---
+
+## Cross-Feature Tests
+{Tests verifying features interact correctly with each other and prior sprints.}
+
+## Feedback Prompts
+{Specific questions the designer wants feedback on — feel, balance, clarity.}
+```
+
+### Context Sources
+
+When generating a playtest guide, the orchestrator reads:
+
+| Source | Provides |
+|--------|----------|
+| Feature specs (`docs/features/{name}.md`) | What each feature does, acceptance criteria |
+| Sprint tasks (workflow state) | What was actually built, files created/modified |
+| `project.godot` | Entry point scene (`run/main_scene`) |
+| Systems bible (`docs/systems-bible.md`) | Navigation flow between scenes |
+| Previous playtest guide (if exists) | Cumulative game state baseline |
 
 ---
 

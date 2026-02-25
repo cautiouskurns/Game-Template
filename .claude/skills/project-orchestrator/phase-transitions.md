@@ -68,13 +68,14 @@ Next Sprint Phase A  OR  Lifecycle Gate
 ### Phase D Sub-State Sequence
 
 ```
-smoke_test → presenting_review → user_testing ↔ fix_loop → final_approval
+smoke_test → generating_playtest_guide → presenting_review → user_testing ↔ fix_loop → final_approval
 ```
 
 | Sub-State | Description | Transitions To |
 |-----------|-------------|---------------|
-| `smoke_test` | Run `godot --headless --quit`, fix any errors | `presenting_review` (when clean) |
-| `presenting_review` | Compile and present sprint review to user | `user_testing` |
+| `smoke_test` | Run `godot --headless --quit`, fix any errors | `generating_playtest_guide` (when clean) |
+| `generating_playtest_guide` | Generate playtest guide from feature specs + sprint tasks | `presenting_review` |
+| `presenting_review` | Compile and present sprint review + playtest guide to user | `user_testing` |
 | `user_testing` | User is playtesting the build | `fix_loop` (if issues reported) OR `final_approval` (if satisfied) |
 | `fix_loop` | Team lead fixes reported issues, re-runs smoke test | `user_testing` (after fix applied) |
 | `final_approval` | Present formal ACCEPT/REJECT/CHANGES gate | `completed` OR Phase C (if changes requested) |
